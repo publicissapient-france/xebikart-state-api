@@ -1,0 +1,18 @@
+version: 2
+
+jobs:
+  "Build":
+    docker:
+      - image: alpine
+
+    steps:
+      - checkout
+      - run:
+          name: Greeting
+          command: echo Hello, world.
+
+workflows:
+  version: 2
+  full:
+    jobs:
+      - "Build"
