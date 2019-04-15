@@ -11,7 +11,7 @@ ARCHITECTURES=386 amd64
 
 .PHONY: test
 test: format
-	go test $(PKGS)
+	go test -count=1 $(PKGS)
 
 .PHONY: format
 format:
