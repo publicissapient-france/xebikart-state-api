@@ -130,6 +130,6 @@ func main() {
 
 	http.HandleFunc("/events", broker.ServeHTTP)
 
-	log.Fatal("HTTP server error: ", http.ListenAndServe("localhost:3000", nil))
+	log.Fatal("HTTP server error: ", http.ListenAndServe("0.0.0.0:8080", nil))
 
 }
