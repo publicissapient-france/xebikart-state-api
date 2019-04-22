@@ -2,7 +2,6 @@ FROM golang:1.12.4-alpine
 LABEL project=xebikart
 LABEL maintainer=xebikart-team-dashboard
 
-RUN mkdir /app 
 ADD . /go/src/xebia-france/xebikart-state-api 
 WORKDIR /go/src/xebia-france/xebikart-state-api 
 # Git is needed by `go get`
