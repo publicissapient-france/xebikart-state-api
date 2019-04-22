@@ -1,4 +1,4 @@
-FROM golang:1.12.4-alpine
+FROM golang:1.12.4-alpine AS builder
 LABEL project=xebikart
 LABEL maintainer=xebikart-team-dashboard
 
@@ -7,10 +7,13 @@ RUN apk add -u git \
       && rm -rf /var/cache/apk/*
 
 RUN go get -u github.com/golang/dep/cmd/dep
-ADD . /go/src/github.com/xebia-france/xebikart-state-api
+
 WORKDIR /go/src/github.com/xebia-france/xebikart-state-api
-RUN dep ensure
-RUN go build -o main . 
+ADD Gopkg.toml Gopkg.lock ./
+RUN dep ensure --vendor-only
+
+ADD . ./
+RUN go build -o main .
 
 
 # Second part of the multi-stage Dockerfile - build the resulting minimal image
@@ -22,5 +25,5 @@ EXPOSE 8080
 RUN apk add -u ca-certificates \
       && rm -rf /var/cache/apk/*
 
-COPY --from=0 /go/src/xebia-france/xebikart-state-api/main /xebikart-state-api
+COPY --from=builder /go/src/github.com/xebia-france/xebikart-state-api/main /xebikart-state-api
 CMD /xebikart-state-api
