@@ -1,0 +1,11 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: xebikart-state-api-ingress
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: state.xebik.art.
+    external-dns.alpha.kubernetes.io/ttl: "60"
+spec:
+  backend:
+    serviceName: xebikart-state-api
+    servicePort: 8080
