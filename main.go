@@ -115,6 +115,15 @@ func (broker *Broker) listen() {
 
 }
 
+func Hello(rw http.ResponseWriter, req *http.Request) {
+	flusher, _ := rw.(http.Flusher)
+
+	rw.Header().Set("Cache-Control", "no-cache")
+	rw.Header().Set("Access-Control-Allow-Origin", "*")
+	fmt.Fprintf(rw, "OK")
+	flusher.Flush()
+}
+
 func main() {
 
 	broker := NewServer()
@@ -129,6 +138,7 @@ func main() {
 	}()
 
 	http.HandleFunc("/events", broker.ServeHTTP)
+	http.HandleFunc("/", Hello)
 
 	log.Fatal("HTTP server error: ", http.ListenAndServe("0.0.0.0:8080", nil))
 
