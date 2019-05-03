@@ -8,4 +8,4 @@ metadata:
 spec:
   backend:
     serviceName: xebikart-state-api
-    servicePort: 8080
+    servicePort: 80
