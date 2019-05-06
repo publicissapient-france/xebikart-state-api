@@ -20,7 +20,7 @@ RUN go build -o main .
 FROM alpine:3.9.3
 LABEL project=xebikart
 LABEL maintainer=xebikart-team-dashboard
-EXPOSE 8080
+EXPOSE 80
 
 RUN apk add -u ca-certificates \
       && rm -rf /var/cache/apk/*
