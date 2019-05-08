@@ -17,15 +17,15 @@ test: format
 format:
 	go fmt $(PKGS)
 
-.PHONY: dep
-dep: 
-	dep ensure
+.PHONY: module
+init: 
+	go mod init
 
 $(RELEASE_DIR): 
 	mkdir -p $@ || true
 
 .PHONY: build
-build: dep format test $(RELEASE_DIR)  
+build:   
 	$(foreach GOOS, $(PLATFORMS),\
 	$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); go build -v -o $(RELEASE_DIR)/$(BINARY)-$(GOOS)-$(GOARCH))))
 
