@@ -17,8 +17,8 @@ test: format
 format:
 	go fmt $(PKGS)
 
-.PHONY: module
-init: 
+.PHONY: mod
+mod:
 	go mod init
 
 $(RELEASE_DIR): 

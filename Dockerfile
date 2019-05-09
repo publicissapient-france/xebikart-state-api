@@ -6,11 +6,11 @@ LABEL maintainer=xebikart-team-dashboard
 RUN apk add -u git \
       && rm -rf /var/cache/apk/*
 
-ADD .  /var/xebikart-state-api
 WORKDIR /var/xebikart-state-api
+ADD go.mod .
+RUN go mod tidy
 
-RUN go mod tidy 
-
+ADD . ./
 RUN go build -o main .
 
 # Second part of the multi-stage Dockerfile - build the resulting minimal image
