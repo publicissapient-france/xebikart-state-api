@@ -10,21 +10,25 @@ PLATFORMS=darwin linux windows
 ARCHITECTURES=386 amd64
 
 .PHONY: test
-test: go.mod format
+test: dep format
 	go test -count=1 $(PKGS)
 
 .PHONY: format
-format: go.mod 
+format: dep
 	go fmt $(PKGS)
 
 go.mod:
 	go mod init
 
+.PHONY: dep
+dep: go.mod
+	GO111MODULE=on go get
+
 $(RELEASE_DIR): 
 	mkdir -p $@ || true
 
 .PHONY: build
-build: go.mod  
+build: dep  
 	$(foreach GOOS, $(PLATFORMS),\
 	$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); go build -v -o $(RELEASE_DIR)/$(BINARY)-$(GOOS)-$(GOARCH))))
 
