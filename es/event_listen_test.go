@@ -25,10 +25,10 @@ var _ = Describe("Amqp broker", func() {
 
 var _ = Describe("Disconnected Event listener", func() {
 	var amqpListener = AmqpListener{
-		host:     "fakehost",
-		port:     5566,
-		username: "xebi",
-		password: "kart",
+		Host:     "fakehost",
+		Port:     5566,
+		Username: "xebi",
+		Password: "kart",
 	}
 	Context("which request to connect and listen", func() {
 

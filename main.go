@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/xebia-france/xebikart-state-api/es"
 	"github.com/xebia-france/xebikart-state-api/sse"
 )
 
@@ -21,6 +22,13 @@ func hello(rw http.ResponseWriter, req *http.Request) {
 func main() {
 
 	broker := sse.NewBroker()
+	externalEventListener := &es.AmqpListener{
+		EventListener: &es.SSEBridgeEventListner{
+			NotifierChannel: broker.Notifier,
+		},
+	}
+
+	go externalEventListener.Listen()
 
 	go func() {
 		for {
