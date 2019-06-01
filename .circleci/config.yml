@@ -1,18 +1,19 @@
 version: 2
 
 jobs:
-  "Build":
+  "Test":
     docker:
-      - image: alpine
+      - image: circleci/golang:1.12
+    working_directory: /go/src/github.com/xebia-france/xebikart-state-api
 
     steps:
       - checkout
       - run:
-          name: Greeting
-          command: echo Hello, world.
+          name: Test
+          command: make test
 
 workflows:
   version: 2
   full:
     jobs:
-      - "Build"
+      - "Test"
