@@ -1,4 +1,4 @@
-package fr.xebia.xebicon.xebikart.api.infra.endpoint.sse;
+package fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse;
 
 import fr.xebia.xebicon.xebikart.api.infra.EventEmitter;
 import org.eclipse.jetty.servlets.EventSource;
@@ -32,13 +32,16 @@ public class EventSSERegistry extends EventSourceServlet implements EventEmitter
     }
 
     @Override
-    public void send(String data) {
+    public void send(String eventName, String data) {
+        if (isBlank(eventName)) {
+            throw new IllegalArgumentException("eventName must be defined and be non blank.");
+        }
         if (isBlank(data)) {
             throw new IllegalArgumentException("data must be defined and be non blank.");
         }
         eventSources.forEach(eventEmitter -> {
             try {
-                eventEmitter.send(data);
+                eventEmitter.send(eventName, data);
             } catch (RuntimeException e) {
                 LOGGER.error("Unable to send following data: {}", data, e);
             }

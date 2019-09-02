@@ -1,7 +1,7 @@
 package fr.xebia.xebicon.xebikart.api.application.configuration;
 
-import fr.xebia.xebicon.xebikart.api.infra.endpoint.SparkEndpoint;
-import fr.xebia.xebicon.xebikart.api.infra.server.SparkEndpointAdapter;
+import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.SparkEndpoint;
+import fr.xebia.xebicon.xebikart.api.infra.http.server.SparkEndpointAdapter;
 import spark.servlet.SparkApplication;
 import spark.servlet.SparkFilter;
 

@@ -1,6 +1,6 @@
-package fr.xebia.xebicon.xebikart.api.infra.server;
+package fr.xebia.xebicon.xebikart.api.infra.http.server;
 
-import fr.xebia.xebicon.xebikart.api.infra.endpoint.SparkEndpoint;
+import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.SparkEndpoint;
 import spark.Spark;
 import spark.servlet.SparkApplication;
 

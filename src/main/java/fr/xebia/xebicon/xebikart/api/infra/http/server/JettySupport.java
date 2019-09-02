@@ -1,4 +1,4 @@
-package fr.xebia.xebicon.xebikart.api.infra.server;
+package fr.xebia.xebicon.xebikart.api.infra.http.server;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.JettyConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -103,12 +103,10 @@ public class JettySupport {
 
         //  Disable display version
         //  Source : https://stackoverflow.com/questions/15652902/remove-the-http-server-header-in-jetty-9
-        /*
         Stream.of(server.getConnectors())
                 .flatMap(connector -> connector.getConnectionFactories().stream())
                 .filter(connFactory -> connFactory instanceof HttpConnectionFactory)
                 .forEach(httpConnFactory -> ((HttpConnectionFactory) httpConnFactory).getHttpConfiguration().setSendServerVersion(false));
-                */
 
         var context = new ServletContextHandler();
 
