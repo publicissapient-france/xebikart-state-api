@@ -1,7 +1,10 @@
 package fr.xebia.xebicon.xebikart.api;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.JettyConfiguration;
+import fr.xebia.xebicon.xebikart.api.application.configuration.RabbitMqConfiguration;
 import fr.xebia.xebicon.xebikart.api.application.configuration.SSEConfiguration;
+import fr.xebia.xebicon.xebikart.api.infra.DummyPipeEvent;
+import fr.xebia.xebicon.xebikart.api.infra.amqp.AmqpConsumer;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.EventSSERegistry;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ public class Launcher {
     private static final Logger LOGGER = getLogger(Launcher.class);
 
     private JettySupport jettySupport;
+    private AmqpConsumer amqpConsumer;
 
     public static void main(String[] args) {
         var launcher = new Launcher();
@@ -32,10 +36,31 @@ public class Launcher {
                 null,
                 List.of(sseConfiguration)
         );
+/*
+        var rabbitMqConfiguration = new RabbitMqConfiguration(
+                "rabbitmq.xebik.art",
+                1883,
+                List.of("xebikart-events"),
+                "xebikart1",
+                "xebikart1"
+        );
+        */
+
+
+        var rabbitMqConfiguration = new RabbitMqConfiguration(
+                "localhost",
+                5672,
+                List.of("xebikart-events"),
+                "user",
+                "password"
+        );
+
+        amqpConsumer = new AmqpConsumer(rabbitMqConfiguration, List.of(new DummyPipeEvent(eventSSERegistry)));
+        amqpConsumer.start();
 
         jettySupport = new JettySupport(jettyConfiguration);
         jettySupport.start();
-
+/*
         while (!Thread.currentThread().isInterrupted()) {
             eventSSERegistry.sendData("{\"race\": {\"state\": \"AWAITING\"}}");
             try {
@@ -44,14 +69,19 @@ public class Launcher {
                 e.printStackTrace();
             }
         }
-
+*/
     }
 
     public void stop() {
         if (jettySupport != null) {
             jettySupport.stop();
-            ;
+            jettySupport = null;
         }
+        if (amqpConsumer != null) {
+            amqpConsumer.stop();
+            amqpConsumer = null;
+        }
+
     }
 
 }
