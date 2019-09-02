@@ -1,4 +1,4 @@
-package fr.xebia.xebicon.xebikart.api.infra.endpoint;
+package fr.xebia.xebicon.xebikart.api.infra.http.endpoint;
 
 public interface SparkEndpoint {
 

@@ -1,4 +1,4 @@
-package fr.xebia.xebicon.xebikart.api.infra.endpoint.sse;
+package fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse;
 
 import fr.xebia.xebicon.xebikart.api.infra.EventEmitter;
 import org.eclipse.jetty.servlets.EventSource;
@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class HttpEventEmitter implements EventSource, EventEmitter {
@@ -26,6 +27,7 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
 
     @Override
     public void onOpen(Emitter emitter) throws IOException {
+        requireNonNull(emitter, "emitter must be defined.");
         this.emitter = emitter;
     }
 
@@ -35,10 +37,17 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
     }
 
     @Override
-    public void send(String data) {
+    public void send(String eventName, String data) {
+        if (isBlank(eventName)) {
+            throw new IllegalArgumentException("eventName must be defined and be non blank.");
+        }
+        if (isBlank(data)) {
+            throw new IllegalArgumentException("data must be defined and be non blank.");
+        }
+
         if (emitter != null) {
             try {
-                emitter.data(data);
+                emitter.event(eventName, data);
             } catch (IOException e) {
                 emitter = null;
                 LOGGER.debug("Unable to send following data using SSE: {}", data, e);

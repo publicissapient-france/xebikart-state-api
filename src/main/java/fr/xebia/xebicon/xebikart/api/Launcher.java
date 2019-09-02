@@ -2,8 +2,8 @@ package fr.xebia.xebicon.xebikart.api;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.JettyConfiguration;
 import fr.xebia.xebicon.xebikart.api.application.configuration.SSEConfiguration;
-import fr.xebia.xebicon.xebikart.api.infra.endpoint.sse.EventSSERegistry;
-import fr.xebia.xebicon.xebikart.api.infra.server.JettySupport;
+import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.EventSSERegistry;
+import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -37,9 +37,9 @@ public class Launcher {
         jettySupport.start();
 
         while (!Thread.currentThread().isInterrupted()) {
-            eventSSERegistry.send("Coucou");
+            eventSSERegistry.sendData("{\"race\": {\"state\": \"AWAITING\"}}");
             try {
-                Thread.sleep(100);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
