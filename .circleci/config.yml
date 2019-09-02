@@ -1,19 +1,96 @@
-version: 2
+version: 2.1
+orbs:
+  gcp-gcr: circleci/gcp-gcr@0.0.4
+  gcp-cli: circleci/gcp-cli@1.3.0
 
 jobs:
-  "Test":
+  "Verify":
     docker:
-      - image: circleci/golang:1.12
-    working_directory: /go/src/github.com/xebia-france/xebikart-state-api
-
+      - image: circleci/openjdk:11.0
     steps:
       - checkout
       - run:
           name: Test
-          command: make test
+          command: mvn --batch-mode verify
+
+  "Build Docker image":
+    machine:
+      docker_layer_caching: true
+    steps:
+      - checkout
+      - gcp-gcr/build-image:
+          image: xebikart-state-api
+          tag: latest
+          registry-url: eu.gcr.io
+      - run:
+          name: "Export Docker image so it can be persisted to workspace"
+          command: |
+            mkdir docker-images/
+            docker save --output docker-images/xebikart-state-api.tar eu.gcr.io/${GOOGLE_PROJECT_ID}/xebikart-state-api:latest
+      - persist_to_workspace:
+          root: .
+          paths:
+            - docker-images/xebikart-state-api.tar
+            - k8s-manifests
+
+  # Image is pushed to GCR with the CircleCI gcp-gcr Orb
+  # https://circleci.com/orbs/registry/orb/circleci/gcp-gcr
+  # This is essentially just a convenient wrapper around `docker push`
+  "Push Docker image to GCR":
+    machine:
+      docker_layer_caching: true
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Load Docker image from workspace"
+          command: docker load --input docker-images/xebikart-state-api.tar
+      - gcp-gcr/gcr-auth
+      - gcp-gcr/push-image:
+          image: xebikart-state-api
+          tag: latest
+          registry-url: eu.gcr.io
+
+  "Deploy to GKE":
+    executor:
+      name: gcp-cli/google
+    steps:
+      # Get k8s-manifests
+      - attach_workspace:
+          at: .
+      - gcp-cli/initialize
+      - run:
+          name: "Get Kubernetes cluster  credentials"
+          command: gcloud container clusters get-credentials xebikart-gke-dev-1
+      - run:
+          name: "[Debug] Show cluster infos"
+          command: kubectl cluster-info
+      - run:
+          name: "Deploy to GKE"
+          command: kubectl apply -f k8s-manifests
 
 workflows:
   version: 2
-  full:
+  validation:
     jobs:
-      - "Test"
+      - "Verify":
+          filters:
+            branches:
+              ignore:
+                - master
+  deploy:
+    jobs:
+      - "Build Docker image":
+          context: "XebiKart - GCP/GKE Deployment"
+          filters:
+            branches:
+              only:
+                - master
+      - "Push Docker image to GCR":
+          context: "XebiKart - GCP/GKE Deployment"
+          requires:
+            - "Build Docker image"
+      - "Deploy to GKE":
+          context: "XebiKart - GCP/GKE Deployment"
+          requires:
+            - "Push Docker image to GCR"
