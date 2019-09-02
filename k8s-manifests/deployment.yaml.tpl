@@ -18,6 +18,15 @@ spec:
       - name: state-api
         image: eu.gcr.io/xebikart-dev-1/xebikart-state-api:@@DOCKER_TAG@@
         imagePullPolicy: Always
+        env:
+        - name: AMQP_HOST
+          value: "rabbitmq.xebik.art"
+        - name: AMQP_PORT
+          value: "1883"
+        - name: AMQP_USERNAME
+          value: "xebikart1"
+        - name: AMQP_PASSWORD
+          value: "xebikart1"
         resources:
           requests:
             cpu: 100m
