@@ -15,12 +15,12 @@ spec:
         tier: state-api
     spec:
       containers:
-      - name: nginx-react
-        image: eu.gcr.io/xebikart-dev-1/xebikart-state-api:latest
+      - name: state-api
+        image: eu.gcr.io/xebikart-dev-1/xebikart-state-api:@@DOCKER_TAG@@
         imagePullPolicy: Always
         resources:
           requests:
             cpu: 100m
-            memory: 100Mi
+            memory: 1000Mi
         ports:
           - containerPort: 80

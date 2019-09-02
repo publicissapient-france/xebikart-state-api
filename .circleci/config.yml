@@ -20,13 +20,13 @@ jobs:
       - checkout
       - gcp-gcr/build-image:
           image: xebikart-state-api
-          tag: latest
+          tag: ${CIRCLE_SHA1}
           registry-url: eu.gcr.io
       - run:
           name: "Export Docker image so it can be persisted to workspace"
           command: |
             mkdir docker-images/
-            docker save --output docker-images/xebikart-state-api.tar eu.gcr.io/${GOOGLE_PROJECT_ID}/xebikart-state-api:latest
+            docker save --output docker-images/xebikart-state-api.tar eu.gcr.io/${GOOGLE_PROJECT_ID}/xebikart-state-api:${CIRCLE_SHA1}
       - persist_to_workspace:
           root: .
           paths:
@@ -48,7 +48,7 @@ jobs:
       - gcp-gcr/gcr-auth
       - gcp-gcr/push-image:
           image: xebikart-state-api
-          tag: latest
+          tag: ${CIRCLE_SHA1}
           registry-url: eu.gcr.io
 
   "Deploy to GKE":
@@ -65,6 +65,9 @@ jobs:
       - run:
           name: "[Debug] Show cluster infos"
           command: kubectl cluster-info
+      - run:
+          name: "Define docker version"
+          command: cat k8s-manifests/deployment.yaml.tpl | sed -e "s#@@DOCKER_TAG@@#${CIRCLE_SHA1}#g" > k8s-manifests/deployment.yaml; rm -f k8s-manifests/deployment.yaml.tpl
       - run:
           name: "Deploy to GKE"
           command: kubectl apply -f k8s-manifests
