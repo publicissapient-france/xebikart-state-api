@@ -1,26 +1,23 @@
-FROM golang:1.12.4-alpine AS builder
+FROM maven:3.6.0-jdk-11
 LABEL project=xebikart
 LABEL maintainer=xebikart-team-dashboard
 
-# Git is needed by `go get`
-RUN apk add -u git \
-      && rm -rf /var/cache/apk/*
+WORKDIR /workspace
 
-WORKDIR /var/xebikart-state-api
-ADD go.mod .
-RUN go mod tidy
+COPY pom.xml .
+COPY src    ./src
 
-ADD . ./
-RUN go build -o main .
+RUN mvn -Djar.finalName=xebikart-api.jar package
+RUN ls -l target/
+RUN ls -l target/lib
 
-# Second part of the multi-stage Dockerfile - build the resulting minimal image
-FROM alpine:3.9.3
-LABEL project=xebikart
-LABEL maintainer=xebikart-team-dashboard
+FROM openjdk:11-jre-slim
+
+COPY --from=0 /workspace/target/xebikart-1.0-SNAPSHOT.jar /project/xebikart-api.jar
+COPY --from=0 /workspace/target/lib /project/lib
+
+WORKDIR /project
+
 EXPOSE 80
 
-RUN apk add -u ca-certificates \
-      && rm -rf /var/cache/apk/*
-
-COPY --from=builder /var/xebikart-state-api/main /xebikart-state-api
-CMD /xebikart-state-api
+ENTRYPOINT ["java", "--illegal-access=deny", "-jar", "xebikart-api.jar"]
