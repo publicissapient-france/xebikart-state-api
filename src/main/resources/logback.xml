@@ -2,10 +2,6 @@
 
     <appender name="DEFAULT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
-
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
     </appender>
 
     <logger name="fr.xebia.xebicon.xebikart" level="INFO"/>
