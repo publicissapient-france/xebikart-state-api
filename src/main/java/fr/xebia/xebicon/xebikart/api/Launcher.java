@@ -2,16 +2,16 @@ package fr.xebia.xebicon.xebikart.api;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.ConfigurationFactory;
 import fr.xebia.xebicon.xebikart.api.infra.DummyPipeEvent;
-import fr.xebia.xebicon.xebikart.api.infra.amqp.AmqpConsumer;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.EventSSERegistry;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
+import fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer;
 
 import java.util.List;
 
 public class Launcher {
 
     private JettySupport jettySupport;
-    private AmqpConsumer amqpConsumer;
+    private MqttConsumerContainer amqpConsumerContainer;
 
     public static void main(String[] args) {
         var launcher = new Launcher();
@@ -27,8 +27,8 @@ public class Launcher {
 
         var rabbitMqConfiguration = ConfigurationFactory.buildRabbitMqConfiguration();
 
-        amqpConsumer = new AmqpConsumer(rabbitMqConfiguration, List.of(new DummyPipeEvent(eventSSERegistry)));
-        amqpConsumer.start();
+        amqpConsumerContainer = new MqttConsumerContainer(rabbitMqConfiguration, List.of(new DummyPipeEvent(eventSSERegistry)));
+        amqpConsumerContainer.start();
 
         jettySupport = new JettySupport(jettyConfiguration);
         jettySupport.start();
@@ -40,9 +40,9 @@ public class Launcher {
             jettySupport.stop();
             jettySupport = null;
         }
-        if (amqpConsumer != null) {
-            amqpConsumer.stop();
-            amqpConsumer = null;
+        if (amqpConsumerContainer != null) {
+            amqpConsumerContainer.stop();
+            amqpConsumerContainer = null;
         }
 
     }

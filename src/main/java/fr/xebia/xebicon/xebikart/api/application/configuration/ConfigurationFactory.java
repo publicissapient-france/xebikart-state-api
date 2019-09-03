@@ -2,6 +2,7 @@ package fr.xebia.xebicon.xebikart.api.application.configuration;
 
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.EventSSERegistry;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -22,15 +23,15 @@ public class ConfigurationFactory {
     }
 
     public static RabbitMqConfiguration buildRabbitMqConfiguration() {
-        var host = getEnvValue("AMQP_HOST", "localhost");
-        var port = Integer.parseInt(getEnvValue("AMQP_PORT", "5672"));
-        var username = getEnvValue("AMQP_USERNAME", null);
-        var password = getEnvValue("AMQP_PASSWORD", null);
-        var queueName = getEnvValue("AMQP_QUEUE", "xebikart-events");
+        var host = getEnvValue("MQTT_HOST", "localhost");
+        var port = Integer.parseInt(getEnvValue("MQTT_PORT", "1883"));
+        var username = getEnvValue("MQTT_USERNAME", null);
+        var password = getEnvValue("MQTT_PASSWORD", null);
+        var queueNames = getEnvValue("MQTT_QUEUES", "xebikart-events,race-events");
         return new RabbitMqConfiguration(
                 host,
                 port,
-                List.of(queueName),
+                Arrays.asList(queueNames.split(",")),
                 username,
                 password
         );

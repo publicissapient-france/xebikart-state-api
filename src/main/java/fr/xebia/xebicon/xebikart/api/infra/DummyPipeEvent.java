@@ -12,7 +12,7 @@ public class DummyPipeEvent implements EventReceiver {
     }
 
     @Override
-    public void receive(String event) {
-        eventEmitter.sendData(event);
+    public void receive(EventSource eventSource) {
+        eventEmitter.sendData(eventSource.getPayload());
     }
 }
