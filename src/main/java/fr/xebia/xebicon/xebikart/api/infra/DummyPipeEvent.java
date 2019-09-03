@@ -15,4 +15,5 @@ public class DummyPipeEvent implements EventReceiver {
     public void receive(EventSource eventSource) {
         eventEmitter.sendData(eventSource.getPayload());
     }
+
 }

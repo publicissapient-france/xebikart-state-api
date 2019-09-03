@@ -2,7 +2,7 @@ package fr.xebia.xebicon.xebikart.api;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.ConfigurationFactory;
 import fr.xebia.xebicon.xebikart.api.infra.DummyPipeEvent;
-import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.EventSSERegistry;
+import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmitterRegistry;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer;
 
@@ -21,7 +21,7 @@ public class Launcher {
 
     public void start() {
 
-        var eventSSERegistry = new EventSSERegistry();
+        var eventSSERegistry = new SSEServletEventEmitterRegistry();
 
         var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry);
 

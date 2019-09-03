@@ -1,6 +1,6 @@
 package fr.xebia.xebicon.xebikart.api.application.configuration;
 
-import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.EventSSERegistry;
+import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmitterRegistry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,12 +13,12 @@ public class ConfigurationFactory {
         // Utility class
     }
 
-    public static JettyConfiguration buildJettyConfiguration(EventSSERegistry eventSSERegistry) {
+    public static JettyConfiguration buildJettyConfiguration(SSEServletEventEmitterRegistry SSEServletEventEmitterRegistry) {
         var port = Integer.parseInt(getEnvValue("HTTP_PORT", "80"));
         return new JettyConfiguration(
                 port,
                 null,
-                List.of(new SSEConfiguration("/events", eventSSERegistry))
+                List.of(new SSEConfiguration("/events", SSEServletEventEmitterRegistry))
         );
     }
 
