@@ -19,14 +19,16 @@ spec:
         image: eu.gcr.io/xebikart-dev-1/xebikart-state-api:${CIRCLE_SHA1}
         imagePullPolicy: Always
         env:
-        - name: AMQP_HOST
+        - name: MQTT_HOST
           value: "rabbitmq.xebik.art"
-        - name: AMQP_PORT
+        - name: MQTT_PORT
           value: "1883"
-        - name: AMQP_USERNAME
+        - name: MQTT_USERNAME
           value: "xebikart1"
-        - name: AMQP_PASSWORD
+        - name: MQTT_PASSWORD
           value: "xebikart1"
+        - name: MQTT_QUEUES
+          value: "xebikart-events,race-events"
         resources:
           requests:
             cpu: 100m
