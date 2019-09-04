@@ -8,8 +8,6 @@ COPY pom.xml .
 COPY src    ./src
 
 RUN mvn --batch-mode -DfinalName=xebikart-api.jar package
-RUN ls -l target/
-RUN ls -l target/lib
 
 FROM openjdk:11-jre-slim
 
