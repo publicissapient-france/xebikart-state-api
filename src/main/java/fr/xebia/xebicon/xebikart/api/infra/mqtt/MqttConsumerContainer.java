@@ -56,7 +56,7 @@ public class MqttConsumerContainer {
 
                 rabbitMqConfiguration.getQueueNames().forEach(topic -> {
                     try {
-                        LOGGER.info("Subscribe to Mqtt queue '{}'.", topic);
+                        LOGGER.info("Subscribing to MQTT queue '{}'.", topic);
                         mqttClient.subscribe(topic, new InternalListener());
                     } catch (MqttException e) {
                         LOGGER.error("Unable to subscribe to the topic {}.", topic, e);
@@ -88,14 +88,14 @@ public class MqttConsumerContainer {
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             requireNonNull(message, "message must be defined.");
             var payload = new String(message.getPayload(), StandardCharsets.UTF_8);
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("-> MQTT [{}] : {}", topic, payload);
-            }
+
+            LOGGER.trace("-> MQTT [{}] : {}", topic, payload);
+
             if (StringUtils.isNotBlank(payload)) {
                 var eventSource = new EventSource(topic, payload);
                 eventReceivers.forEach(eventReceiver -> eventReceiver.receive(eventSource));
             } else if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Receive an empty payload MQTT message, ignore it.");
+                LOGGER.trace("Received an empty payload MQTT message, ignore it.");
             }
         }
 

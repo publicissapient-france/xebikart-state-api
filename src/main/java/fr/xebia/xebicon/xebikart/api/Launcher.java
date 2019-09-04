@@ -11,7 +11,7 @@ import java.util.List;
 public class Launcher {
 
     private JettySupport jettySupport;
-    private MqttConsumerContainer amqpConsumerContainer;
+    private MqttConsumerContainer mqttConsumerContainer;
 
     public static void main(String[] args) {
         var launcher = new Launcher();
@@ -27,8 +27,8 @@ public class Launcher {
 
         var rabbitMqConfiguration = ConfigurationFactory.buildRabbitMqConfiguration();
 
-        amqpConsumerContainer = new MqttConsumerContainer(rabbitMqConfiguration, List.of(new DummyPipeEvent(eventSSERegistry)));
-        amqpConsumerContainer.start();
+        mqttConsumerContainer = new MqttConsumerContainer(rabbitMqConfiguration, List.of(new DummyPipeEvent(eventSSERegistry)));
+        mqttConsumerContainer.start();
 
         jettySupport = new JettySupport(jettyConfiguration);
         jettySupport.start();
@@ -40,9 +40,9 @@ public class Launcher {
             jettySupport.stop();
             jettySupport = null;
         }
-        if (amqpConsumerContainer != null) {
-            amqpConsumerContainer.stop();
-            amqpConsumerContainer = null;
+        if (mqttConsumerContainer != null) {
+            mqttConsumerContainer.stop();
+            mqttConsumerContainer = null;
         }
 
     }
