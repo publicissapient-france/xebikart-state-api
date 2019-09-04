@@ -95,7 +95,7 @@ public class MqttConsumerContainer {
                 var eventSource = new EventSource(topic, payload);
                 eventReceivers.forEach(eventReceiver -> eventReceiver.receive(eventSource));
             } else if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace("Received an empty payload MQTT message, ignore it.");
+                LOGGER.trace("Received an empty payload MQTT message; ignoring it.");
             }
         }
 
