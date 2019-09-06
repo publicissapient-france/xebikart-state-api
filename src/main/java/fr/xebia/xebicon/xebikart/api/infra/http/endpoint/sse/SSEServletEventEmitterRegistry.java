@@ -60,6 +60,7 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
                 eventEmitter.send(eventName, data);
             } catch (RuntimeException e) {
                 LOGGER.error("Unable to send following data: {}", data, e);
+                eventSources.remove(eventEmitter);
             }
         });
     }
@@ -68,10 +69,16 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
     public void run() {
         LOGGER.trace("Sending comment");
         eventSources.forEach(eventEmitter -> {
-            try {
-                eventEmitter.comment("heartbeat");
-            } catch (Exception e) {
-                LOGGER.error("Unable to send heartbeat to a SSE client.", e);
+            if (eventEmitter.isOpened()) {
+                try {
+                    eventEmitter.comment("heartbeat");
+                } catch (Exception e) {
+                    LOGGER.error("Unable to send heartbeat to a SSE client.", e);
+                    eventSources.remove(eventEmitter);
+                }
+            } else {
+                LOGGER.debug("SSE client closed, removed it");
+                eventSources.remove(eventEmitter);
             }
         });
         try {

@@ -25,7 +25,8 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
             LOGGER.debug("Create a new Event source client from {}.", httpServletRequest.getRemoteAddr());
         } else {
             LOGGER.info("Create a new Event source client");
-        }this.httpServletRequest = httpServletRequest;
+        }
+        this.httpServletRequest = httpServletRequest;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
 
     @Override
     public void onClose() {
-        this.emitter = null;
+        dropEmitter();
     }
 
     @Override
@@ -80,6 +81,10 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
         emitter.close();
         emitter = null;
         LOGGER.trace("Drop SSE client {}.", httpServletRequest.getRemoteAddr());
+    }
+
+    public boolean isOpened() {
+        return emitter != null;
     }
 
 }
