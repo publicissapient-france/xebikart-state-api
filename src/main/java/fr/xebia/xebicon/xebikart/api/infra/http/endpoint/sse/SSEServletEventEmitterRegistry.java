@@ -23,7 +23,12 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
     public SSEServletEventEmitterRegistry(ScheduledExecutorService executorService) {
         LOGGER.info("Start an instance of SSEServletEventEmitterRegistry");
         eventSources = new ArrayList<>();
-        executorService.schedule(this, 20, TimeUnit.SECONDS);
+        executorService.scheduleAtFixedRate(
+                this,
+                20,
+                20,
+                TimeUnit.SECONDS
+        );
     }
 
     @Override
