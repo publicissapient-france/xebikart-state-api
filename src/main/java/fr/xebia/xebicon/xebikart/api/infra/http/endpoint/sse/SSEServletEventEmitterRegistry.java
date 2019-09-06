@@ -6,6 +6,8 @@ import org.eclipse.jetty.servlets.EventSourceServlet;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,6 +39,12 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
         var eventSource = new HttpEventEmitter(request);
         eventSources.add(eventSource);
         return eventSource;
+    }
+
+    @Override
+    protected void respond(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        super.respond(request, response);
     }
 
     @Override
