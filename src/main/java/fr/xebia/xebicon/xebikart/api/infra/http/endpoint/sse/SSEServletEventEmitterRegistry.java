@@ -28,7 +28,7 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
 
     @Override
     protected EventSource newEventSource(HttpServletRequest request) {
-        LOGGER.info("request a new EventSource");
+        LOGGER.info("Request a new EventSource");
         var eventSource = new HttpEventEmitter(request);
         eventSources.add(eventSource);
         return eventSource;
@@ -54,11 +54,17 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
     @Override
     public void run() {
         LOGGER.trace("Sending comment");
-        eventSources.forEach(eventEmitter -> eventEmitter.comment("heartbeat"));
+        eventSources.forEach(eventEmitter -> {
+            try {
+                eventEmitter.comment("heartbeat");
+            } catch (Exception e) {
+                LOGGER.error("Unable to send heartbeat to a SSE client.", e);
+            }
+        });
         try {
             Thread.sleep(10);
         } catch (InterruptedException e) {
-           Thread.interrupted();
+            Thread.interrupted();
         }
     }
 

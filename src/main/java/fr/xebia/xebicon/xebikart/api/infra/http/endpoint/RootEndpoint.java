@@ -12,11 +12,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class RootEndpoint extends HttpServlet {
 
-    private static final Logger LOGGER = getLogger(RootEndpoint.class);
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LOGGER.trace("Healthcheck called on '{}'", req.getPathInfo());
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 

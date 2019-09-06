@@ -6,6 +6,8 @@
 
     <logger name="fr.xebia.xebicon.xebikart" level="TRACE"/>
     <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.RootEndpoint" level="TRACE"/>
+    <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse" level="TRACE"/>
+
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="spark" level="INFO"/>
 
