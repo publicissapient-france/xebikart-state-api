@@ -1,6 +1,7 @@
 package fr.xebia.xebicon.xebikart.api;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.ConfigurationFactory;
+import fr.xebia.xebicon.xebikart.api.application.configuration.EndpointConfiguration;
 import fr.xebia.xebicon.xebikart.api.infra.DummyPipeEvent;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmitterRegistry;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
@@ -23,7 +24,10 @@ public class Launcher {
 
         var eventSSERegistry = new SSEServletEventEmitterRegistry();
 
-        var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry);
+        var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints();
+        var sparkConfiguration = ConfigurationFactory.buildSparkConfiguration(sparkEndpoints);
+
+        var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry, sparkConfiguration);
 
         var rabbitMqConfiguration = ConfigurationFactory.buildRabbitMqConfiguration();
 

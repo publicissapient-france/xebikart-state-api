@@ -1,9 +1,12 @@
 package fr.xebia.xebicon.xebikart.api.application.configuration;
 
+import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.SparkEndpoint;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmitterRegistry;
+import fr.xebia.xebicon.xebikart.api.infra.http.server.SparkEndpointAdapter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -13,13 +16,23 @@ public class ConfigurationFactory {
         // Utility class
     }
 
-    public static JettyConfiguration buildJettyConfiguration(SSEServletEventEmitterRegistry SSEServletEventEmitterRegistry) {
+    public static JettyConfiguration buildJettyConfiguration(
+            SSEServletEventEmitterRegistry SSEServletEventEmitterRegistry,
+            SparkConfiguration sparkConfiguration
+    ) {
+
         var port = Integer.parseInt(getEnvValue("HTTP_PORT", "80"));
         return new JettyConfiguration(
                 port,
-                null,
+                sparkConfiguration,
                 List.of(new SSEConfiguration("/events", SSEServletEventEmitterRegistry))
         );
+
+    }
+
+    public static SparkConfiguration buildSparkConfiguration(Set<SparkEndpoint> sparkEndpoints) {
+        var sparkApplication = new SparkEndpointAdapter("", sparkEndpoints);
+        return new SparkConfiguration("", sparkApplication);
     }
 
     public static RabbitMqConfiguration buildRabbitMqConfiguration() {

@@ -18,7 +18,7 @@ public class SparkConfiguration {
 
     private final SparkFilter sparkFilter;
 
-    public SparkConfiguration(String sparkFilterPrefix, SparkApplication sparkApplication, boolean withMetrics) {
+    public SparkConfiguration(String sparkFilterPrefix, SparkApplication sparkApplication) {
         if (isBlank(sparkFilterPrefix)) {
             throw new IllegalArgumentException("sparkFilterPrefix must be defined and be non blank.");
         }
@@ -40,11 +40,10 @@ public class SparkConfiguration {
         };
     }
 
-    public SparkConfiguration(String sparkFilterPrefix, SparkEndpoint sparkEndpoint, boolean withMetrics) {
+    public SparkConfiguration(String sparkFilterPrefix, SparkEndpoint sparkEndpoint) {
         this(
                 sparkFilterPrefix,
-                new SparkEndpointAdapter(sparkFilterPrefix, Collections.singleton(sparkEndpoint)),
-                withMetrics
+                new SparkEndpointAdapter(sparkFilterPrefix, Collections.singleton(sparkEndpoint))
         );
     }
 
