@@ -12,6 +12,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ConfigurationFactory {
 
+    public static final String PATH_PREFIX = "/api";
+
     private ConfigurationFactory() {
         // Utility class
     }
@@ -31,8 +33,8 @@ public class ConfigurationFactory {
     }
 
     public static SparkConfiguration buildSparkConfiguration(Set<SparkEndpoint> sparkEndpoints) {
-        var sparkApplication = new SparkEndpointAdapter("", sparkEndpoints);
-        return new SparkConfiguration("/*", sparkApplication);
+        var sparkApplication = new SparkEndpointAdapter(PATH_PREFIX, sparkEndpoints);
+        return new SparkConfiguration(PATH_PREFIX, sparkApplication);
     }
 
     public static RabbitMqConfiguration buildRabbitMqConfiguration() {

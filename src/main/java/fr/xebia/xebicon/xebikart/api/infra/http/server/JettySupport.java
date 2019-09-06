@@ -12,7 +12,9 @@ import spark.Spark;
 
 import javax.inject.Inject;
 import javax.servlet.DispatcherType;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -23,13 +25,23 @@ public class JettySupport {
     private static final Logger LOGGER = LoggerFactory.getLogger(JettySupport.class);
     private static final String KEYSTORE_PASSWORD = "";
     private final JettyConfiguration configuration;
+    private final List<ServletContextHandlerConfigurer> servletContextHandlerConfigurers;
     private final Object monitor = new Object();
     private Server server;
 
     @Inject
-    public JettySupport(JettyConfiguration configuration) {
+    public JettySupport(JettyConfiguration configuration, List<ServletContextHandlerConfigurer> servletContextHandlerConfigurers) {
         requireNonNull(configuration, "configuration must be defined.");
         this.configuration = configuration;
+        if (servletContextHandlerConfigurers == null) {
+            this.servletContextHandlerConfigurers = Collections.emptyList();
+        } else {
+            this.servletContextHandlerConfigurers = servletContextHandlerConfigurers;
+        }
+    }
+
+    public JettySupport(JettyConfiguration configuration) {
+        this(configuration, null);
     }
 
     public void start() {
@@ -110,6 +122,16 @@ public class JettySupport {
 
         var context = new ServletContextHandler();
 
+        servletContextHandlerConfigurers.forEach(configurer -> configurer.configureServletContextHandler(context));
+
+        configuration.getSseConfigurations().forEach(sseConfiguration -> {
+            //  SSE power
+            var sseServletHolder = new ServletHolder(sseConfiguration.getServlet());
+            sseServletHolder.setAsyncSupported(true);
+            context.addServlet(sseServletHolder, sseConfiguration.getPath());
+        });
+
+
         configuration.getSparkConfiguration().ifPresent(sparkConfiguration -> {
             var sparkFilter = sparkConfiguration.getSparkFilter();
 
@@ -119,15 +141,12 @@ public class JettySupport {
 
         });
 
-        configuration.getSseConfigurations().forEach(sseConfiguration -> {
-            //  SSE power
-            var sseServletHolder = new ServletHolder(sseConfiguration.getServlet());
-            sseServletHolder.setAsyncSupported(true);
-            context.addServlet(sseServletHolder, sseConfiguration.getPath());
-        });
-
         server.setHandler(context);
         return server;
+    }
+
+    public interface ServletContextHandlerConfigurer {
+        void configureServletContextHandler(ServletContextHandler context);
     }
 
 }
