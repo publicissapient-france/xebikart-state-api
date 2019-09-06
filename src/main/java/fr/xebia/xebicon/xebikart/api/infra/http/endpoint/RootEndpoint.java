@@ -16,7 +16,7 @@ public class RootEndpoint extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LOGGER.trace("healthcheck called");
+        LOGGER.trace("Healthcheck called on '{}'", req.getPathInfo());
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
