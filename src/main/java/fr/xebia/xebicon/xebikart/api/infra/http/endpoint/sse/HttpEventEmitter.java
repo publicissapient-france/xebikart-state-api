@@ -49,9 +49,11 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
             try {
                 emitter.event(eventName, data);
             } catch (IOException e) {
-                emitter = null;
                 LOGGER.debug("Unable to send following data using SSE: {}", data, e);
+                dropEmitter();
             }
+        } else {
+            LOGGER.debug("No emitter defined.");
         }
     }
 
@@ -63,10 +65,18 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
             try {
                 emitter.comment(comment);
             } catch (IOException e) {
-                emitter = null;
                 LOGGER.debug("Unable to send following comment using SSE: {}", comment, e);
+                dropEmitter();
             }
+        } else {
+            LOGGER.debug("No emitter defined.");
         }
+    }
+
+    private void dropEmitter() {
+        emitter.close();
+        emitter = null;
+        LOGGER.trace("Drop SSE client {}.", httpServletRequest.getRemoteAddr());
     }
 
 }
