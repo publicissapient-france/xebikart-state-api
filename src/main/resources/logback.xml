@@ -6,6 +6,7 @@
 
     <logger name="fr.xebia.xebicon.xebikart" level="INFO"/>
     <logger name="org.eclipse.jetty" level="INFO"/>
+    <logger name="spark" level="INFO"/>
     <root level="WARN">
         <appender-ref ref="DEFAULT"/>
     </root>

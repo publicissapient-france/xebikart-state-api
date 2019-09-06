@@ -1,18 +1,16 @@
 package fr.xebia.xebicon.xebikart.api.infra.http.endpoint;
 
-import fr.xebia.xebicon.xebikart.api.infra.http.server.JsonTransformer;
-import spark.Spark;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-public class RootEndpoint implements SparkEndpoint {
+public class RootEndpoint extends HttpServlet {
 
     @Override
-    public void configure() {
-        Spark.get(
-                "/",
-                "*/*",
-                (request, response) -> "",
-                new JsonTransformer()
-        );
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
 
 }

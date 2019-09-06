@@ -34,7 +34,9 @@ public class Launcher {
         mqttConsumerContainer = new MqttConsumerContainer(rabbitMqConfiguration, List.of(new DummyPipeEvent(eventSSERegistry)));
         mqttConsumerContainer.start();
 
-        jettySupport = new JettySupport(jettyConfiguration);
+        var servletContextHandlerConfigurers = EndpointConfiguration.buildServletContextHandlerConfigurers();
+
+        jettySupport = new JettySupport(jettyConfiguration, servletContextHandlerConfigurers);
         jettySupport.start();
 
     }
