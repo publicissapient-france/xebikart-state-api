@@ -47,6 +47,14 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
         if (isBlank(data)) {
             throw new IllegalArgumentException("data must be defined and be non blank.");
         }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
+                    "Dispatching event [{}] with following payload to {} SSE client(s): {}",
+                    eventName,
+                    eventSources.size(),
+                    data
+            );
+        }
         eventSources.forEach(eventEmitter -> {
             try {
                 eventEmitter.send(eventName, data);
