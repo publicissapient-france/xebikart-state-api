@@ -4,9 +4,11 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
 
-    <logger name="fr.xebia.xebicon.xebikart" level="INFO"/>
+    <logger name="fr.xebia.xebicon.xebikart" level="TRACE"/>
+    <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.RootEndpoint" level="TRACE"/>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="spark" level="INFO"/>
+
     <root level="WARN">
         <appender-ref ref="DEFAULT"/>
     </root>

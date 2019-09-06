@@ -58,7 +58,7 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
         try {
             Thread.sleep(10);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+           Thread.interrupted();
         }
     }
 
