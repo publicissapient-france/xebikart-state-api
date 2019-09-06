@@ -8,6 +8,7 @@ import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer;
 
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class Launcher {
 
@@ -22,7 +23,7 @@ public class Launcher {
 
     public void start() {
 
-        var eventSSERegistry = new SSEServletEventEmitterRegistry();
+        var eventSSERegistry = new SSEServletEventEmitterRegistry(Executors.newScheduledThreadPool(1));
 
         var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints();
         var sparkConfiguration = ConfigurationFactory.buildSparkConfiguration(sparkEndpoints);
