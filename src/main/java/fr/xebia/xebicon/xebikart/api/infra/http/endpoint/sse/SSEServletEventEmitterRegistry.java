@@ -8,19 +8,22 @@ import org.slf4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class SSEServletEventEmitterRegistry extends EventSourceServlet implements EventEmitter {
+public class SSEServletEventEmitterRegistry extends EventSourceServlet implements EventEmitter, Runnable {
 
     private static final Logger LOGGER = getLogger(SSEServletEventEmitterRegistry.class);
 
-    private final List<EventEmitter> eventSources;
+    private final List<HttpEventEmitter> eventSources;
 
-    public SSEServletEventEmitterRegistry() {
+    public SSEServletEventEmitterRegistry(ScheduledExecutorService executorService) {
         LOGGER.info("Start an instance of SSEServletEventEmitterRegistry");
         eventSources = new ArrayList<>();
+        executorService.schedule(this, 20, TimeUnit.SECONDS);
     }
 
     @Override
@@ -46,6 +49,17 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
                 LOGGER.error("Unable to send following data: {}", data, e);
             }
         });
+    }
+
+    @Override
+    public void run() {
+        LOGGER.trace("Sending comment");
+        eventSources.forEach(eventEmitter -> eventEmitter.comment("heartbeat"));
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

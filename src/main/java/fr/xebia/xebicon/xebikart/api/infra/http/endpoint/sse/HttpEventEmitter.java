@@ -54,4 +54,19 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
             }
         }
     }
+
+    public void comment(String comment) {
+        if (isBlank(comment)) {
+            throw new IllegalArgumentException("comment must be defined and be non blank.");
+        }
+        if (emitter != null) {
+            try {
+                emitter.comment(comment);
+            } catch (IOException e) {
+                emitter = null;
+                LOGGER.debug("Unable to send following comment using SSE: {}", comment, e);
+            }
+        }
+    }
+
 }
