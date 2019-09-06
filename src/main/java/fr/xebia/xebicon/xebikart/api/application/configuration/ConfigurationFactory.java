@@ -31,8 +31,8 @@ public class ConfigurationFactory {
     }
 
     public static SparkConfiguration buildSparkConfiguration(Set<SparkEndpoint> sparkEndpoints) {
-        var sparkApplication = new SparkEndpointAdapter("", sparkEndpoints);
-        return new SparkConfiguration("", sparkApplication);
+        var sparkApplication = new SparkEndpointAdapter("/*", sparkEndpoints);
+        return new SparkConfiguration("/*", sparkApplication);
     }
 
     public static RabbitMqConfiguration buildRabbitMqConfiguration() {
