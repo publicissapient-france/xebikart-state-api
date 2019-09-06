@@ -21,8 +21,11 @@ public class HttpEventEmitter implements EventSource, EventEmitter {
 
     public HttpEventEmitter(HttpServletRequest httpServletRequest) {
         requireNonNull(httpServletRequest, "httpServletRequest must be defined.");
-        LOGGER.info("Create a new Event source client");
-        this.httpServletRequest = httpServletRequest;
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Create a new Event source client from {}.", httpServletRequest.getRemoteAddr());
+        } else {
+            LOGGER.info("Create a new Event source client");
+        }this.httpServletRequest = httpServletRequest;
     }
 
     @Override
