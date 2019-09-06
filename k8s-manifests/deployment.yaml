@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: state-api
-        image: eu.gcr.io/xebikart-dev-1/xebikart-state-api:${CIRCLE_SHA1}
+        image: eu.gcr.io/xebikart-dev-1/xebikart-state-api:@@DOCKER_TAG@@
         imagePullPolicy: Always
         env:
         - name: MQTT_HOST
