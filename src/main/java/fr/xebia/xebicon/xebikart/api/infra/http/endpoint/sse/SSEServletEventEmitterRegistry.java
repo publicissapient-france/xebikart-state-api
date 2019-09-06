@@ -12,14 +12,14 @@ import java.util.List;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class EventSSERegistry extends EventSourceServlet implements EventEmitter {
+public class SSEServletEventEmitterRegistry extends EventSourceServlet implements EventEmitter {
 
-    private static final Logger LOGGER = getLogger(EventSSERegistry.class);
+    private static final Logger LOGGER = getLogger(SSEServletEventEmitterRegistry.class);
 
     private final List<EventEmitter> eventSources;
 
-    public EventSSERegistry() {
-        LOGGER.info("Start an instance of EventSSERegistry");
+    public SSEServletEventEmitterRegistry() {
+        LOGGER.info("Start an instance of SSEServletEventEmitterRegistry");
         eventSources = new ArrayList<>();
     }
 

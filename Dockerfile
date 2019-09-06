@@ -7,9 +7,7 @@ WORKDIR /workspace
 COPY pom.xml .
 COPY src    ./src
 
-RUN mvn -Djar.finalName=xebikart-api.jar package
-RUN ls -l target/
-RUN ls -l target/lib
+RUN mvn --batch-mode -DfinalName=xebikart-api.jar package
 
 FROM openjdk:11-jre-slim
 
