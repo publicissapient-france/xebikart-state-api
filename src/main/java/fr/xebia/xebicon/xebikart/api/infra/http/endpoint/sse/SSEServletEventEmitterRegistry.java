@@ -11,12 +11,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class SSEServletEventEmitterRegistry extends EventSourceServlet implements EventEmitter, Runnable {
+public class SSEServletEventEmitterRegistry extends EventSourceServlet implements EventEmitter {
 
     private static final Logger LOGGER = getLogger(SSEServletEventEmitterRegistry.class);
 
@@ -25,12 +24,6 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
     public SSEServletEventEmitterRegistry(ScheduledExecutorService executorService) {
         LOGGER.info("Start an instance of SSEServletEventEmitterRegistry");
         eventSources = new ArrayList<>();
-        executorService.scheduleAtFixedRate(
-                this,
-                20,
-                20,
-                TimeUnit.SECONDS
-        );
     }
 
     @Override
@@ -71,29 +64,6 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
                 eventSources.remove(eventEmitter);
             }
         });
-    }
-
-    @Override
-    public void run() {
-        LOGGER.trace("Sending comment");
-        eventSources.forEach(eventEmitter -> {
-            if (eventEmitter.isOpened()) {
-                try {
-                    eventEmitter.comment("heartbeat");
-                } catch (Exception e) {
-                    LOGGER.error("Unable to send heartbeat to a SSE client.", e);
-                    eventSources.remove(eventEmitter);
-                }
-            } else {
-                LOGGER.debug("SSE client closed, removed it");
-                eventSources.remove(eventEmitter);
-            }
-        });
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            Thread.interrupted();
-        }
     }
 
 }
