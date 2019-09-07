@@ -66,7 +66,7 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
         eventSources.forEach(eventEmitter -> {
             try {
                 eventEmitter.send(eventName, data);
-            } catch (RuntimeException e) {
+            } catch (Exception e) {
                 LOGGER.error("Unable to send following data: {}", data, e);
                 eventSources.remove(eventEmitter);
             }

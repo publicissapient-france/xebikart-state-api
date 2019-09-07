@@ -8,12 +8,14 @@ import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Launcher {
 
     private JettySupport jettySupport;
     private MqttConsumerContainer mqttConsumerContainer;
+    private ExecutorService executorService;
 
     public static void main(String[] args) {
         var launcher = new Launcher();
@@ -32,7 +34,13 @@ public class Launcher {
 
         var rabbitMqConfiguration = ConfigurationFactory.buildRabbitMqConfiguration();
 
-        mqttConsumerContainer = new MqttConsumerContainer(rabbitMqConfiguration, List.of(new DummyPipeEvent(eventSSERegistry)));
+        executorService = Executors.newSingleThreadExecutor();
+        mqttConsumerContainer = new MqttConsumerContainer(
+                rabbitMqConfiguration,
+                List.of(new DummyPipeEvent(eventSSERegistry)),
+                executorService
+        );
+
         mqttConsumerContainer.start();
 
         var servletContextHandlerConfigurers = EndpointConfiguration.buildServletContextHandlerConfigurers();
@@ -51,7 +59,7 @@ public class Launcher {
             mqttConsumerContainer.stop();
             mqttConsumerContainer = null;
         }
-
+        executorService.shutdownNow();
     }
 
 }
