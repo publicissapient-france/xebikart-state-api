@@ -67,7 +67,10 @@ public class MqttConsumerContainer {
                         )
                 );
             });
-
+            mqttClientBuilder.automaticReconnect();
+            var connectionListener = new MqttConnectionListener();
+            mqttClientBuilder.addConnectedListener(connectionListener);
+            mqttClientBuilder.addDisconnectedListener(connectionListener);
             mqttClient = mqttClientBuilder.buildBlocking();
             mqttClient.connect();
             LOGGER.info("Connected to MQTT server {}:{}", rabbitMqConfiguration.getHost(), rabbitMqConfiguration.getPort());
@@ -137,8 +140,8 @@ public class MqttConsumerContainer {
                     LOGGER.error("An error occurred while handling a message.", e);
                 }
             });
-        } else if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Received an empty payload MQTT message; ignoring it.");
+        } else if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Received an empty payload MQTT message; ignoring it.");
         }
     }
 }
