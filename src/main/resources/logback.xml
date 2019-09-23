@@ -6,12 +6,10 @@
 
     <logger name="fr.xebia.xebicon.xebikart" level="DEBUG"/>
     <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse" level="TRACE"/>
-    <logger name="fr.xebia.xebicon.xebikart.api.infra.mqtt" level="TRACE"/>
+    <logger name="fr.xebia.xebicon.xebikart.api.infra.mqtt" level="INFO"/>
 
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="spark" level="INFO"/>
-    <logger name="org.eclipse.paho.client.mqttv3" level="TRACE"/>
-    <logger name="org.eclipse.paho" level="TRACE"/>
 
     <root level="WARN">
         <appender-ref ref="DEFAULT"/>
