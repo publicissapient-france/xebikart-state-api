@@ -72,6 +72,14 @@
             <artifactId>annotations</artifactId>
             <version>17.0.0</version>
         </dependency>
+        <!--
+        <dependency>
+            <groupId>org.mp4parser</groupId>
+            <artifactId>isoparser</artifactId>
+            <version>1.9.27</version>
+        </dependency>
+        -->
+
 
         <dependency>
             <groupId>com.sparkjava</groupId>
