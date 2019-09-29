@@ -1,12 +1,12 @@
-package fr.xebia.xebicon.xebikart.api.infra;
+package fr.xebia.xebicon.xebikart.api.application.bus;
 
 import static java.util.Objects.requireNonNull;
 
-public class DummyPipeEvent implements EventReceiver {
+public class DirectPipeEvent implements EventReceiver {
 
     private final EventEmitter eventEmitter;
 
-    public DummyPipeEvent(EventEmitter eventEmitter) {
+    public DirectPipeEvent(EventEmitter eventEmitter) {
         requireNonNull(eventEmitter, "eventEmitter must be defined.");
         this.eventEmitter = eventEmitter;
     }

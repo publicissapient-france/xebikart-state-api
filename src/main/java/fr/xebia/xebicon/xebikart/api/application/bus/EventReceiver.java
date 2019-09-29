@@ -1,4 +1,4 @@
-package fr.xebia.xebicon.xebikart.api.infra;
+package fr.xebia.xebicon.xebikart.api.application.bus;
 
 public interface EventReceiver {
 

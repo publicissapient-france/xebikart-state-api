@@ -1,4 +1,4 @@
-package fr.xebia.xebicon.xebikart.api.infra;
+package fr.xebia.xebicon.xebikart.api.application.bus;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -27,4 +27,5 @@ public class EventSource {
     public String getPayload() {
         return payload;
     }
+    
 }

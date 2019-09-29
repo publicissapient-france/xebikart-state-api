@@ -2,7 +2,7 @@ package fr.xebia.xebicon.xebikart.api;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.ConfigurationFactory;
 import fr.xebia.xebicon.xebikart.api.application.configuration.EndpointConfiguration;
-import fr.xebia.xebicon.xebikart.api.infra.DummyPipeEvent;
+import fr.xebia.xebicon.xebikart.api.application.bus.DirectPipeEvent;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmitterRegistry;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer;
@@ -37,7 +37,7 @@ public class Launcher {
         executorService = Executors.newSingleThreadExecutor();
         mqttConsumerContainer = new MqttConsumerContainer(
                 rabbitMqConfiguration,
-                List.of(new DummyPipeEvent(eventSSERegistry)),
+                List.of(new DirectPipeEvent(eventSSERegistry)),
                 executorService
         );
 
