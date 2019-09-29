@@ -1,6 +1,5 @@
 package fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse;
 
-import fr.xebia.xebicon.xebikart.api.infra.EventEmitter;
 import org.eclipse.jetty.servlets.EventSource;
 import org.slf4j.Logger;
 
