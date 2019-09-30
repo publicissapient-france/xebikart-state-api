@@ -10,7 +10,6 @@
     <logger name="fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer" level="INFO"/>
     <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.VideoHttpServlet" level="TRACE"/>
 
-
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="spark" level="INFO"/>
 
