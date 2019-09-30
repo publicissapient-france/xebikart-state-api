@@ -70,7 +70,7 @@ jobs:
           command: sed -i -e "s#@@DOCKER_TAG@@#${CIRCLE_SHA1}#g" k8s-manifests/deployment.yaml
       - run:
           name: "Deploy to GKE"
-          command: kubectl apply -f k8s-manifests
+          command: kubectl apply -f k8s-manifests -n apps-production
 
 workflows:
   version: 2
