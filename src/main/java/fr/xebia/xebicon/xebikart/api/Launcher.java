@@ -1,5 +1,6 @@
 package fr.xebia.xebicon.xebikart.api;
 
+import fr.xebia.xebicon.xebikart.api.application.LocalFileVideoFetcher;
 import fr.xebia.xebicon.xebikart.api.application.configuration.ConfigurationFactory;
 import fr.xebia.xebicon.xebikart.api.application.configuration.EndpointConfiguration;
 import fr.xebia.xebicon.xebikart.api.application.bus.DirectPipeEvent;
@@ -7,6 +8,7 @@ import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmit
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,7 +45,9 @@ public class Launcher {
 
         mqttConsumerContainer.start();
 
-        var servletContextHandlerConfigurers = EndpointConfiguration.buildServletContextHandlerConfigurers();
+        var videoDirectory = new File("/home/jpthiery/workspace/xebia/xebikart/xebikart-api/src/test/resources/video/tub");
+        var videoFetcher = new LocalFileVideoFetcher(videoDirectory);
+        var servletContextHandlerConfigurers = EndpointConfiguration.buildServletContextHandlerConfigurers(videoFetcher);
 
         jettySupport = new JettySupport(jettyConfiguration, servletContextHandlerConfigurers);
         jettySupport.start();
