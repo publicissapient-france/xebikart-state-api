@@ -10,7 +10,8 @@
 
 
     <properties>
-        <!-- version.number>${git.commit.time}.${git.commit.id.abbrev}</version.number -->
+
+      <!-- version.number>${git.commit.time}.${git.commit.id.abbrev}</version.number -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
