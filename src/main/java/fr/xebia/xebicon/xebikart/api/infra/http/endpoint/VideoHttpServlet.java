@@ -38,14 +38,13 @@ public class VideoHttpServlet extends HttpServlet {
                 CONTENT_TYPE_FORMAT,
                 boundary
         ));
-        resp.flushBuffer();
 
         var out = resp.getOutputStream();
         out.println("--" + boundary);
 
         videoFetcher.video()
                 .subscribe(videoFrame -> {
-                    //LOGGER.trace("Sending content of {} which size {}", videoFrame.getFilename(), videoFrame.getContent().length);
+                    LOGGER.trace("Sending content from '{}' which size {}", videoFrame.getOrigin(), videoFrame.getContent().length);
                     out.println(CONTENT_TYPE_FRAME);
                     out.println(String.format(CONTENT_LENGTH_FORMAT, videoFrame.getContent().length));
                     out.println();
@@ -54,6 +53,8 @@ public class VideoHttpServlet extends HttpServlet {
                     out.println("--" + boundary);
                     out.flush();
 
+                }, t -> {
+                    LOGGER.error("An error occurred while processing video frame stream.", t);
                 }).isDisposed();
         out.println();
         out.println("--" + boundary);

@@ -19,7 +19,8 @@ public class ConfigurationFactory {
     }
 
     public static JettyConfiguration buildJettyConfiguration(
-            SSEServletEventEmitterRegistry SSEServletEventEmitterRegistry,
+            SSEServletEventEmitterRegistry eventSSEServletEventEmitterRegistry,
+            SSEServletEventEmitterRegistry universeSSEServletEventEmitterRegistry,
             SparkConfiguration sparkConfiguration
     ) {
 
@@ -27,7 +28,10 @@ public class ConfigurationFactory {
         return new JettyConfiguration(
                 port,
                 sparkConfiguration,
-                List.of(new SSEConfiguration("/events", SSEServletEventEmitterRegistry))
+                List.of(
+                        new SSEConfiguration("/events", eventSSEServletEventEmitterRegistry),
+                        new SSEConfiguration("/universes", universeSSEServletEventEmitterRegistry)
+                )
         );
 
     }
@@ -42,7 +46,7 @@ public class ConfigurationFactory {
         var port = Integer.parseInt(getEnvValue("MQTT_PORT", "1883"));
         var username = getEnvValue("MQTT_USERNAME", null);
         var password = getEnvValue("MQTT_PASSWORD", null);
-        var queueNames = getEnvValue("MQTT_QUEUES", "xebikart-events,race-events");
+        var queueNames = getEnvValue("MQTT_QUEUES", "xebikart-car-video,xebikart-events,race-events");
         return new RabbitMqConfiguration(
                 host,
                 port,
@@ -51,7 +55,6 @@ public class ConfigurationFactory {
                 password
         );
     }
-
 
     private static String getEnvValue(String key) {
         return getEnvValue(key, "");

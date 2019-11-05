@@ -1,5 +1,8 @@
 package fr.xebia.xebicon.xebikart.api.application.cqrs
 
+import fr.xebia.xebicon.xebikart.api.application.bus.EventEmitter
+import fr.xebia.xebicon.xebikart.api.infra.GsonProvider
+
 abstract class Identifier() {
     abstract val id: String
 }
@@ -55,6 +58,10 @@ interface EventStore {
     fun <E : Event> getEvents(id: Identifier): List<E>
 }
 
+interface EventStoreListener {
+    fun <E : Event> eventsAppenned(events: List<E>)
+}
+
 interface AggrateStrategy {
     fun <S : State, C : Command<Identifier>, E : Event> aggregateForIdentifier(id: Identifier): Aggregate<S, C, E>?
 }
@@ -91,3 +98,16 @@ class CqrsEngine<I : Identifier, S : State, C : Command<I>, E : Event>(private v
 
 }
 
+class OutputCqrsBusEntrypoint(private val emitter: EventEmitter) : EventStoreListener {
+
+    override fun <E : Event> eventsAppenned(events: List<E>) {
+        val gson = GsonProvider.provideGson()
+        events.map {
+            val json = gson.toJsonTree(it).asJsonObject
+            val eventType = it::class.java.simpleName
+            json.addProperty("eventType", eventType)
+            emitter.send(eventType, json.toString())
+        }
+    }
+
+}

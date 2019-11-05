@@ -51,6 +51,18 @@ public class MqttConsumerContainer {
         this.executorService = executorService;
     }
 
+    public MqttConsumerContainer(
+            RabbitMqConfiguration rabbitMqConfiguration,
+            EventReceiver eventReceiver,
+            ExecutorService executorService
+    ) {
+        this(
+                rabbitMqConfiguration,
+                List.of(eventReceiver),
+                executorService
+        );
+    }
+
     public synchronized void start() {
         if (mqttClient == null) {
             var mqttClientBuilder = Mqtt3Client.builder()
@@ -75,43 +87,19 @@ public class MqttConsumerContainer {
             mqttClient.connect();
             LOGGER.info("Connected to MQTT server {}:{}", rabbitMqConfiguration.getHost(), rabbitMqConfiguration.getPort());
 
-            rabbitMqConfiguration.getQueueNames().forEach(queueName -> {
-                var subscribeMessage = Mqtt3Subscribe.builder()
-                        .topicFilter(queueName)
-                        .qos(MqttQos.EXACTLY_ONCE)
-                        .build();
-                LOGGER.info("Subscribing topic to {}", queueName);
-                mqttClient.subscribe(subscribeMessage);
-            });
 
-            poller = new InternalPoller();
+            var subcribeResult = mqttClient.subscribeWith()
+                    .topicFilter("#")
+                    .qos(MqttQos.AT_MOST_ONCE)
+                    .send();
+            LOGGER.info(subcribeResult.toString());
+            LOGGER.info("Subscribing topic to all topic of Mqtt server");
+
+
+            poller = new InternalPoller(mqttClient.publishes(MqttGlobalPublishFilter.ALL));
             executorService.submit(poller);
 
         }
-    }
-
-    private class InternalPoller implements Runnable {
-
-        @Override
-        public void run() {
-            while (!Thread.currentThread().isInterrupted() && isConnected()) {
-                var publishes = mqttClient.publishes(MqttGlobalPublishFilter.ALL);
-                LOGGER.trace("Waiting to received message.");
-                try {
-                    var optReceived = publishes.receive(10, TimeUnit.SECONDS);
-                    optReceived.ifPresent(published -> {
-                        var topic = published.getTopic().toString();
-                        var payload = published.getPayloadAsBytes();
-                        if (payload.length > 0) {
-                            messageArrived(topic, payload);
-                        }
-                    });
-                } catch (InterruptedException e) {
-                    Thread.interrupted();
-                }
-            }
-        }
-
     }
 
     public synchronized boolean isConnected() {
@@ -126,10 +114,10 @@ public class MqttConsumerContainer {
         }
     }
 
-    private void messageArrived(String topic, byte[] message) {
+    private void messageArrived(String topic,  byte[] message) {
         requireNonNull(message, "message must be defined.");
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("-> MQTT [{}] : {}", topic, new String(message));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("-> MQTT [{}] : {}", topic, new String(message));
         }
 
         if (message.length > 0) {
@@ -144,5 +132,35 @@ public class MqttConsumerContainer {
         } else if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Received an empty payload MQTT message; ignoring it.");
         }
+    }
+
+    private class InternalPoller implements Runnable {
+
+        private final Mqtt3BlockingClient.Mqtt3Publishes publishes;
+
+        private InternalPoller(Mqtt3BlockingClient.Mqtt3Publishes publishes) {
+            this.publishes = publishes;
+        }
+
+        @Override
+        public void run() {
+            LOGGER.trace("Starting listener");
+            while (!Thread.currentThread().isInterrupted() && isConnected()) {
+                LOGGER.trace("Waiting to received message.");
+                try {
+                    var optReceived = publishes.receive(1, TimeUnit.SECONDS);
+                    optReceived.ifPresent(published -> {
+                        var topic = published.getTopic().toString();
+                        var payload = published.getPayloadAsBytes();
+                        if (payload.length > 0) {
+                            messageArrived(topic, payload);
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    Thread.interrupted();
+                }
+            }
+        }
+
     }
 }

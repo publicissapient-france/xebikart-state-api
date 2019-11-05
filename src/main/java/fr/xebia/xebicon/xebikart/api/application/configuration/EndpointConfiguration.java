@@ -1,6 +1,7 @@
 package fr.xebia.xebicon.xebikart.api.application.configuration;
 
 import fr.xebia.xebicon.xebikart.api.application.VideoFetcher;
+import fr.xebia.xebicon.xebikart.api.application.cqrs.*;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.*;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -10,9 +11,10 @@ import java.util.Set;
 
 public class EndpointConfiguration {
 
-    public static Set<SparkEndpoint> buildSparkEndpoints() {
+    public static Set<SparkEndpoint> buildSparkEndpoints(CqrsEngine<UniverseIdentifier, UniverseState, UniverseCommand, UniverseEvent> cqrsEngine) {
         return Set.of(
-                healthEndpoint()
+                healthEndpoint(),
+                universeEndpoint(cqrsEngine)
         );
     }
 
@@ -32,6 +34,7 @@ public class EndpointConfiguration {
         var servlet = new VideoHttpServlet(videoFetcher);
         return context -> context.addServlet(new ServletHolder(servlet), "/car/video");
     }
+
     public static JettySupport.ServletContextHandlerConfigurer videoHtmlEndpointConfigurer() {
         return context -> context.addServlet(new ServletHolder(new VideoHtmlPage()), "/car");
     }
@@ -40,5 +43,8 @@ public class EndpointConfiguration {
         return new HealthEndpoint();
     }
 
+    public static SparkEndpoint universeEndpoint(CqrsEngine<UniverseIdentifier, UniverseState, UniverseCommand, UniverseEvent> cqrsEngine) {
+        return new UniverseEndpoint(cqrsEngine);
+    }
 
 }
