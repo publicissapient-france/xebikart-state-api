@@ -101,8 +101,8 @@ public class MqttConsumerContainer {
                     var optReceived = publishes.receive(10, TimeUnit.SECONDS);
                     optReceived.ifPresent(published -> {
                         var topic = published.getTopic().toString();
-                        var payload = new String(published.getPayloadAsBytes());
-                        if (StringUtils.isNotBlank(payload)) {
+                        var payload = published.getPayloadAsBytes();
+                        if (payload.length > 0) {
                             messageArrived(topic, payload);
                         }
                     });
@@ -126,12 +126,13 @@ public class MqttConsumerContainer {
         }
     }
 
-    private void messageArrived(String topic, String message) {
+    private void messageArrived(String topic, byte[] message) {
         requireNonNull(message, "message must be defined.");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("-> MQTT [{}] : {}", topic, new String(message));
+        }
 
-        LOGGER.debug("-> MQTT [{}] : {}", topic, message);
-
-        if (StringUtils.isNotBlank(message)) {
+        if (message.length > 0) {
             var eventSource = new EventSource(topic, message);
             eventReceivers.forEach(eventReceiver -> {
                 try {

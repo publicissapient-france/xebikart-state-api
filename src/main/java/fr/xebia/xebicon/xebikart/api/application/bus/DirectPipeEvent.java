@@ -13,7 +13,7 @@ public class DirectPipeEvent implements EventReceiver {
 
     @Override
     public void receive(EventSource eventSource) {
-        eventEmitter.sendData(eventSource.getPayload());
+        eventEmitter.sendData(eventSource.getPayloadAsString());
     }
 
 }
