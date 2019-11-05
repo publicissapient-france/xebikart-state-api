@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
-public class CqrsBridge<I extends Identifier, C extends Command<I>, E extends Event> implements EventReceiver {
+public class InputCqrsBridge<I extends Identifier, C extends Command<I>, E extends Event> implements EventReceiver {
 
     private final EventSourceToCommandConverter<I> commandConverter;
 
@@ -19,7 +19,7 @@ public class CqrsBridge<I extends Identifier, C extends Command<I>, E extends Ev
     private final EventReceiver output;
 
     @Inject
-    public CqrsBridge(EventSourceToCommandConverter<I> commandConverter, CqrsEventToEventSourceConverter<E> cqrsEventConverter, CqrsEngine cqrsEngine, EventReceiver output) {
+    public InputCqrsBridge(EventSourceToCommandConverter<I> commandConverter, CqrsEventToEventSourceConverter<E> cqrsEventConverter, CqrsEngine cqrsEngine, EventReceiver output) {
         requireNonNull(commandConverter);
         requireNonNull(cqrsEventConverter);
         requireNonNull(cqrsEngine);

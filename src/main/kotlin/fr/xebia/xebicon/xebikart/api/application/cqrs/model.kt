@@ -56,3 +56,42 @@ object RaceNotExist : RaceState() {
     override val identifier: RaceIdentifier
         get() = RaceIdentifier(Unknown.id)
 }
+
+data class UniverseIdentifier(override val id: String) : Identifier()
+
+sealed class UniverseState() : State {
+    abstract val identifier: UniverseIdentifier
+    override fun identifier(): UniverseIdentifier {
+        return identifier
+    }
+}
+
+object UniverseNotExist : UniverseState() {
+    override val identifier: UniverseIdentifier
+        get() = UniverseIdentifier(Unknown.id)
+}
+
+sealed class UniverseCommand() : Command<UniverseIdentifier> {
+    abstract val identifier: UniverseIdentifier
+    override fun identifier(): UniverseIdentifier {
+        return identifier
+    }
+}
+
+sealed class UniverseEvent() : Event {
+    abstract val identifier: UniverseIdentifier
+    abstract val happenedDate: Long
+    override fun identifier(): UniverseIdentifier {
+        return identifier
+    }
+
+    override fun happenedDate(): Long {
+        return happenedDate
+    }
+}
+
+data class SwitchUniverse(override val identifier: UniverseIdentifier): UniverseCommand()
+
+data class UniverseAvailable(override val identifier: UniverseIdentifier): UniverseState()
+
+data class UniverseSelected(override val identifier: UniverseIdentifier, override val happenedDate: Long): UniverseEvent()

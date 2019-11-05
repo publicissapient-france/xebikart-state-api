@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -21,7 +20,7 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
 
     private final List<HttpEventEmitter> eventSources;
 
-    public SSEServletEventEmitterRegistry(ScheduledExecutorService executorService) {
+    public SSEServletEventEmitterRegistry() {
         LOGGER.info("Start an instance of SSEServletEventEmitterRegistry");
         eventSources = new ArrayList<>();
     }
@@ -56,14 +55,17 @@ public class SSEServletEventEmitterRegistry extends EventSourceServlet implement
                     data
             );
         }
-        eventSources.forEach(eventEmitter -> {
+        var emitterToRemoved = new ArrayList<HttpEventEmitter>();
+        var currentEventSource = new ArrayList<>(eventSources);
+        currentEventSource.forEach(eventEmitter -> {
             try {
                 eventEmitter.send(eventName, data);
             } catch (Exception e) {
                 LOGGER.error("Unable to send following data: {}", data, e);
-                eventSources.remove(eventEmitter);
+                emitterToRemoved.add(eventEmitter);
             }
         });
+        emitterToRemoved.forEach(eventSources::remove);
     }
 
 }

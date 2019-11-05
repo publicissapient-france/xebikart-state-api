@@ -2,17 +2,17 @@ package fr.xebia.xebicon.xebikart.api.application.model;
 
 public class CarVideoFrame {
 
-    private final String filename;
+    private final String origin;
 
     private final byte[] content;
 
-    public CarVideoFrame(String filename, byte[] content) {
-        this.filename = filename;
+    public CarVideoFrame(String origin, byte[] content) {
+        this.origin = origin;
         this.content = content;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getOrigin() {
+        return origin;
     }
 
     public byte[] getContent() {
