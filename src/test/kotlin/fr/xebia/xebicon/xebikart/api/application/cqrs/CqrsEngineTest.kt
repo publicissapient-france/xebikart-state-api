@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 internal class CqrsEngineTest {
 
-    private val eventStore = TestEventStore
+    private val eventStore = TestEventStore()
     private val cqrsEngine = CqrsEngine(eventStore, Boat())
 
     @Test
