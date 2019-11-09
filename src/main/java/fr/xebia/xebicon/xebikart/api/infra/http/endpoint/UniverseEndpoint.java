@@ -9,6 +9,7 @@ import fr.xebia.xebicon.xebikart.api.infra.http.server.JsonTransformer;
 import org.slf4j.Logger;
 import spark.Request;
 import spark.Response;
+import spark.Spark;
 
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isAnyBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
-import static spark.Spark.post;
+import static spark.Spark.*;
 
 public class UniverseEndpoint implements SparkEndpoint {
 
@@ -33,6 +34,31 @@ public class UniverseEndpoint implements SparkEndpoint {
 
     @Override
     public void configure() {
+
+        before("/*", (request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Credentials", "true");
+        });
+
+        options("/*",
+                (request, response) -> {
+                    var accessControlRequestHeaders = request
+                            .headers("Access-Control-Request-Headers");
+                    if (accessControlRequestHeaders != null) {
+                        response.header("Access-Control-Allow-Headers",
+                                accessControlRequestHeaders);
+                    }
+
+                    var accessControlRequestMethod = request
+                            .headers("Access-Control-Request-Method");
+                    if (accessControlRequestMethod != null) {
+                        response.header("Access-Control-Allow-Methods",
+                                accessControlRequestMethod);
+                    }
+
+                    return "OK";
+                });
+
 
         post(
                 "/poll/reset",
@@ -77,7 +103,7 @@ public class UniverseEndpoint implements SparkEndpoint {
 
     public Object stopSurvey(Request request, Response response) {
         var surveyResult = universeService.close();
-        return  surveyResult.fold(reason -> reason,
+        return surveyResult.fold(reason -> reason,
                 SurveyResultDto::new
         );
     }
