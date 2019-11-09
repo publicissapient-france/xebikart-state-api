@@ -32,19 +32,18 @@ public class Launcher {
     public void start() {
 
         var eventStore = new InMemoryEventStore();
-        var cqrsEngine = new CqrsEngine<UniverseIdentifier, UniverseState, UniverseCommand, UniverseEvent>(
+        var cqrsEngine = new CqrsEngine<SurveyIdentifier, SurveyState, SurveyCommand, SurveyEvent>(
                 eventStore,
-                new Universe()
+                new Survey()
         );
 
         var universeEventSSERegistry = new SSEServletEventEmitterRegistry();
-
-        var universeOutputBridge = new OutputCqrsBusEntrypoint(universeEventSSERegistry);
-        eventStore.registerListener(universeOutputBridge);
+        eventStore.registerListener(new SurveyEventStoreListenerToSSEEmitter(universeEventSSERegistry, eventStore));
 
         var eventSSERegistry = new SSEServletEventEmitterRegistry();
 
-        var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints(cqrsEngine);
+        var universeService = new CqrsUniverseService(cqrsEngine, eventStore);
+        var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints(universeService);
         var sparkConfiguration = ConfigurationFactory.buildSparkConfiguration(sparkEndpoints);
 
         var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry, universeEventSSERegistry, sparkConfiguration);

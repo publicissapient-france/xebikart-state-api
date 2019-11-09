@@ -161,7 +161,7 @@ object BoatIdentifierStrategy : AggrateStrategy {
 
 }
 
-object TestEventStore : EventStore {
+class TestEventStore : EventStore {
 
     private val cache: MutableMap<Identifier, List<Event>> = mutableMapOf()
 
@@ -177,6 +177,11 @@ object TestEventStore : EventStore {
     override fun <E : Event> getEvents(id: Identifier): List<E> {
         return cache[id] as List<E>? ?: emptyList()
     }
+
+    fun <E: Event> getAllEvents(): List<E> {
+        return cache.values.toList()[0] as List<E>
+
+    }
 }
 
 
@@ -184,3 +189,6 @@ val titanic = BoatIdentifier("Titanic")
 val brest = Harbor("Brest")
 val havre = Harbor("Havre")
 val newYork = Harbor("New-York")
+
+val bestBoatSurveyIdentifier = SurveyIdentifier("best boat")
+val bestBoatSurveyName = "Best boat survey"

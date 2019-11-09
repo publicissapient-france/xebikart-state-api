@@ -1,5 +1,6 @@
 package fr.xebia.xebicon.xebikart.api.application.configuration;
 
+import fr.xebia.xebicon.xebikart.api.application.UniverseService;
 import fr.xebia.xebicon.xebikart.api.application.VideoFetcher;
 import fr.xebia.xebicon.xebikart.api.application.cqrs.*;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.*;
@@ -11,10 +12,10 @@ import java.util.Set;
 
 public class EndpointConfiguration {
 
-    public static Set<SparkEndpoint> buildSparkEndpoints(CqrsEngine<UniverseIdentifier, UniverseState, UniverseCommand, UniverseEvent> cqrsEngine) {
+    public static Set<SparkEndpoint> buildSparkEndpoints(UniverseService universeService) {
         return Set.of(
                 healthEndpoint(),
-                universeEndpoint(cqrsEngine)
+                universeEndpoint(universeService)
         );
     }
 
@@ -43,8 +44,8 @@ public class EndpointConfiguration {
         return new HealthEndpoint();
     }
 
-    public static SparkEndpoint universeEndpoint(CqrsEngine<UniverseIdentifier, UniverseState, UniverseCommand, UniverseEvent> cqrsEngine) {
-        return new UniverseEndpoint(cqrsEngine);
+    public static SparkEndpoint universeEndpoint(UniverseService universeService) {
+        return new UniverseEndpoint(universeService);
     }
 
 }
