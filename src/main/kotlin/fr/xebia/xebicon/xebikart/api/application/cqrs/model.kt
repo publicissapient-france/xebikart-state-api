@@ -71,6 +71,11 @@ object UniverseNotExist : UniverseState() {
         get() = UniverseIdentifier(Unknown.id)
 }
 
+object Default : ModeState() {
+    override val identifier: ModeIdentifier
+        get() = ModeIdentifier(Unknown.id)
+}
+
 sealed class UniverseCommand() : Command<UniverseIdentifier> {
     abstract val identifier: UniverseIdentifier
     override fun identifier(): UniverseIdentifier {
@@ -100,9 +105,18 @@ data class UniverseSelected(override val identifier: UniverseIdentifier, overrid
 
 data class SurveyIdentifier(override val id: String) : Identifier()
 
+data class ModeIdentifier(override val id: String) : Identifier()
+
 sealed class SurveyState() : State {
     abstract val identifier: SurveyIdentifier
     override fun identifier(): SurveyIdentifier {
+        return identifier
+    }
+}
+
+sealed class ModeState() : State {
+    abstract val identifier: ModeIdentifier
+    override fun identifier(): ModeIdentifier {
         return identifier
     }
 }
@@ -119,10 +133,29 @@ sealed class SurveyCommand() : Command<SurveyIdentifier> {
     }
 }
 
+sealed class ModeCommand() : Command<ModeIdentifier> {
+    abstract val identifier: ModeIdentifier
+    override fun identifier(): ModeIdentifier {
+        return identifier
+    }
+}
+
 sealed class SurveyEvent() : Event {
     abstract val identifier: SurveyIdentifier
     abstract val happenedDate: Long
     override fun identifier(): SurveyIdentifier {
+        return identifier
+    }
+
+    override fun happenedDate(): Long {
+        return happenedDate
+    }
+}
+
+sealed class ModeEvent() : Event {
+    abstract val identifier: ModeIdentifier
+    abstract val happenedDate: Long
+    override fun identifier(): ModeIdentifier {
         return identifier
     }
 
@@ -141,11 +174,15 @@ data class StartSurvey(override val identifier: SurveyIdentifier) : SurveyComman
 data class AddVoteToChoiceInSurvey(override val identifier: SurveyIdentifier, val vote: Vote) : SurveyCommand()
 data class CloseSurvey(override val identifier: SurveyIdentifier) : SurveyCommand()
 
-data class SurveyCreated(override val identifier: SurveyIdentifier, override val happenedDate: Long, val name: String): SurveyEvent()
-data class SurveyChoiceAdded(override val identifier: SurveyIdentifier, override val happenedDate: Long, val choice: String): SurveyEvent()
-data class SurveyStarted(override val identifier: SurveyIdentifier, override val happenedDate: Long): SurveyEvent()
-data class SurveyVoteReceived(override val identifier: SurveyIdentifier, override val happenedDate: Long, val vote: Vote): SurveyEvent()
-data class SurveyClosed(override val identifier: SurveyIdentifier, override val happenedDate: Long): SurveyEvent()
+data class SurveyCreated(override val identifier: SurveyIdentifier, override val happenedDate: Long, val name: String) : SurveyEvent()
+data class SurveyChoiceAdded(override val identifier: SurveyIdentifier, override val happenedDate: Long, val choice: String) : SurveyEvent()
+data class SurveyStarted(override val identifier: SurveyIdentifier, override val happenedDate: Long) : SurveyEvent()
+data class SurveyVoteReceived(override val identifier: SurveyIdentifier, override val happenedDate: Long, val vote: Vote) : SurveyEvent()
+data class SurveyClosed(override val identifier: SurveyIdentifier, override val happenedDate: Long) : SurveyEvent()
 
+data class Vote(val choice: String, val osOfParticipant: String)
 
-data class Vote(val choice: String,  val osOfParticipant: String)
+data class SetMode(override val identifier: ModeIdentifier, val mode: String, val data: Any) : ModeCommand()
+
+data class ModeSet(override val identifier: ModeIdentifier, override val happenedDate: Long, val mode: String, val data: Any) : ModeEvent()
+

@@ -12,7 +12,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ConfigurationFactory {
 
-    public static final String PATH_PREFIX = "/api";
+    private static final String PATH_PREFIX = "/api";
 
     private ConfigurationFactory() {
         // Utility class
@@ -20,6 +20,7 @@ public class ConfigurationFactory {
 
     public static JettyConfiguration buildJettyConfiguration(
             SSEServletEventEmitterRegistry eventSSEServletEventEmitterRegistry,
+            SSEServletEventEmitterRegistry modeSSEServletEventEmitterRegistry,
             SSEServletEventEmitterRegistry universeSSEServletEventEmitterRegistry,
             SparkConfiguration sparkConfiguration
     ) {
@@ -30,7 +31,8 @@ public class ConfigurationFactory {
                 sparkConfiguration,
                 List.of(
                         new SSEConfiguration("/events", eventSSEServletEventEmitterRegistry),
-                        new SSEConfiguration("/universes", universeSSEServletEventEmitterRegistry)
+                        new SSEConfiguration("/universes", universeSSEServletEventEmitterRegistry),
+                        new SSEConfiguration("/modes", modeSSEServletEventEmitterRegistry)
                 )
         );
 
