@@ -1,19 +1,29 @@
 package fr.xebia.xebicon.xebikart.api.application.cqrs.mode
 
+import com.google.gson.JsonParseException
 import fr.xebia.xebicon.xebikart.api.application.bus.EventEmitter
-import fr.xebia.xebicon.xebikart.api.application.cqrs.*
+import fr.xebia.xebicon.xebikart.api.application.cqrs.Event
+import fr.xebia.xebicon.xebikart.api.application.cqrs.EventStore
+import fr.xebia.xebicon.xebikart.api.application.cqrs.EventStoreListener
+import fr.xebia.xebicon.xebikart.api.application.cqrs.ModeSet
 import fr.xebia.xebicon.xebikart.api.infra.GsonProvider
+import org.slf4j.LoggerFactory
 
 class ModeEventStoreListenerToSSEEmitter(
         private val eventEmitter: EventEmitter,
         private val eventStore: EventStore
 ) : EventStoreListener {
+  private val LOGGER = LoggerFactory.getLogger(ModeEventStoreListenerToSSEEmitter::class.java)
 
-    override fun <E : Event> eventsAppenned(events: List<E>) {
-        val provideGson = GsonProvider.provideGson()
-        events.forEach {
-            eventEmitter.send(ModeSet::class.java.simpleName, provideGson.toJson(it))
-        }
-
+  override fun <E : Event> eventsAppenned(events: List<E>) {
+    val provideGson = GsonProvider.provideGson()
+    events.forEach {
+      try {
+        eventEmitter.send(ModeSet::class.java.simpleName, provideGson.toJson(it))
+      } catch (e: JsonParseException) {
+        LOGGER.warn("Cannot send event ${it.identifier()}")
+      }
     }
+
+  }
 }
