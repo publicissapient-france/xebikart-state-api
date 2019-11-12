@@ -7,7 +7,7 @@ class Mode(private val clock: Clock = Clock.systemDefaultZone()) : Aggregate<Mod
 
     override fun decide(state: ModeState, command: ModeCommand): AggregateDecideResult =
             when (state) {
-                is Default ->
+                is DefaultMode ->
                     when (command) {
                         is SetMode ->
                             SuccessfulDecideResult(listOf(
@@ -17,6 +17,6 @@ class Mode(private val clock: Clock = Clock.systemDefaultZone()) : Aggregate<Mod
 
     override fun apply(state: ModeState, event: ModeEvent): ModeState = state
 
-    override fun notExistState() = Default
+    override fun notExistState() = DefaultMode
 
 }

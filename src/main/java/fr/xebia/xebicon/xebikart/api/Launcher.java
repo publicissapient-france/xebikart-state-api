@@ -45,7 +45,7 @@ public class Launcher {
                 new Mode()
         );
         var modeSSERegistry = new SSEServletEventEmitterRegistry();
-        store.registerListener(new ModeEventStoreListenerToSSEEmitter(modeSSERegistry, store));
+        store.registerListener(new ModeEventStoreListenerToSSEEmitter(modeSSERegistry));
         var modeService = new CqrsModeService(cqrsModeEngine);
 
         var universeEventSSERegistry = new SSEServletEventEmitterRegistry();

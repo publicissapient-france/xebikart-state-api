@@ -71,7 +71,7 @@ object UniverseNotExist : UniverseState() {
         get() = UniverseIdentifier(Unknown.id)
 }
 
-object Default : ModeState() {
+object DefaultMode : ModeState() {
     override val identifier: ModeIdentifier
         get() = ModeIdentifier(Unknown.id)
 }

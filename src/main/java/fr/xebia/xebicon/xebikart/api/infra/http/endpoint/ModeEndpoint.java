@@ -1,14 +1,14 @@
 package fr.xebia.xebicon.xebikart.api.infra.http.endpoint;
 
 import fr.xebia.xebicon.xebikart.api.application.cqrs.mode.ModeService;
-import fr.xebia.xebicon.xebikart.api.infra.GsonProvider;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JsonTransformer;
 import org.slf4j.Logger;
 import spark.Request;
 import spark.Response;
 
+import static fr.xebia.xebicon.xebikart.api.infra.GsonProvider.provideGson;
 import static org.slf4j.LoggerFactory.getLogger;
-import static spark.Spark.*;
+import static spark.Spark.post;
 
 public class ModeEndpoint implements SparkEndpoint {
 
@@ -37,16 +37,26 @@ public class ModeEndpoint implements SparkEndpoint {
     }
 
     private ModeDto convertBodyToModeDto(String body) {
-        return GsonProvider.provideGson().fromJson(body, ModeDto.class);
+        return provideGson().fromJson(body, ModeDto.class);
     }
 
     private static class ModeDto {
-        public final String mode;
-        public final Object data;
+
+        private final String mode;
+        private final Object data;
 
         private ModeDto(String mode, Object data) {
             this.mode = mode;
             this.data = data;
         }
+
+        public Object getData() {
+            return data;
+        }
+
+        public String getMode() {
+            return mode;
+        }
+
     }
 }
