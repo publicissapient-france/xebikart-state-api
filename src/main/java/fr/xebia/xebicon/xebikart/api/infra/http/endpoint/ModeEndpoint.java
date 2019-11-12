@@ -23,32 +23,6 @@ public class ModeEndpoint implements SparkEndpoint {
 
     @Override
     public void configure() {
-
-        before("/*", (request, response) -> {
-            response.header("Access-Control-Allow-Origin", "*");
-            response.header("Access-Control-Allow-Credentials", "true");
-        });
-
-        options("/*",
-                (request, response) -> {
-                    var accessControlRequestHeaders = request
-                            .headers("Access-Control-Request-Headers");
-                    if (accessControlRequestHeaders != null) {
-                        response.header("Access-Control-Allow-Headers",
-                                accessControlRequestHeaders);
-                    }
-
-                    var accessControlRequestMethod = request
-                            .headers("Access-Control-Request-Method");
-                    if (accessControlRequestMethod != null) {
-                        response.header("Access-Control-Allow-Methods",
-                                accessControlRequestMethod);
-                    }
-
-                    return "OK";
-                });
-
-
         post(
                 "/mode",
                 APPLICATION_JSON,

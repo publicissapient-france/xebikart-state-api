@@ -182,7 +182,7 @@ data class SurveyClosed(override val identifier: SurveyIdentifier, override val 
 
 data class Vote(val choice: String, val osOfParticipant: String)
 
-data class SetMode(override val identifier: ModeIdentifier, val mode: String, val data: Any) : ModeCommand()
+data class SetMode(override val identifier: ModeIdentifier, val mode: String, val data: Any?) : ModeCommand()
 
-data class ModeSet(override val identifier: ModeIdentifier, override val happenedDate: Long, val mode: String, val data: Any) : ModeEvent()
+data class ModeSet(override val identifier: ModeIdentifier, override val happenedDate: Long, val mode: String, val data: Any?) : ModeEvent()
 
