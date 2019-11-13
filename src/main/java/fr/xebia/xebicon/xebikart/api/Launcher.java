@@ -6,6 +6,9 @@ import fr.xebia.xebicon.xebikart.api.application.bus.FilteredPipeEvent;
 import fr.xebia.xebicon.xebikart.api.application.configuration.ConfigurationFactory;
 import fr.xebia.xebicon.xebikart.api.application.configuration.EndpointConfiguration;
 import fr.xebia.xebicon.xebikart.api.application.cqrs.*;
+import fr.xebia.xebicon.xebikart.api.application.cqrs.mode.CqrsModeService;
+import fr.xebia.xebicon.xebikart.api.application.cqrs.mode.Mode;
+import fr.xebia.xebicon.xebikart.api.application.cqrs.mode.ModeEventStoreListenerToSSEEmitter;
 import fr.xebia.xebicon.xebikart.api.infra.cqrs.InMemoryEventStore;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmitterRegistry;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
@@ -29,24 +32,33 @@ public class Launcher {
     }
 
 
-    public void start() {
+    private void start() {
 
-        var eventStore = new InMemoryEventStore();
-        var cqrsEngine = new CqrsEngine<SurveyIdentifier, SurveyState, SurveyCommand, SurveyEvent>(
-                eventStore,
+        var store = new InMemoryEventStore();
+        var cqrsUniverseEngine = new CqrsEngine<SurveyIdentifier, SurveyState, SurveyCommand, SurveyEvent>(
+                store,
                 new Survey()
         );
 
+        var cqrsModeEngine = new CqrsEngine<ModeIdentifier, ModeState, ModeCommand, ModeEvent>(
+                store,
+                new Mode()
+        );
+        var modeSSERegistry = new SSEServletEventEmitterRegistry();
+        store.registerListener(new ModeEventStoreListenerToSSEEmitter(modeSSERegistry));
+        var modeService = new CqrsModeService(cqrsModeEngine);
+
         var universeEventSSERegistry = new SSEServletEventEmitterRegistry();
-        eventStore.registerListener(new SurveyEventStoreListenerToSSEEmitter(universeEventSSERegistry, eventStore));
+        store.registerListener(new SurveyEventStoreListenerToSSEEmitter(universeEventSSERegistry, store));
 
         var eventSSERegistry = new SSEServletEventEmitterRegistry();
 
-        var universeService = new CqrsUniverseService(cqrsEngine, eventStore);
-        var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints(universeService);
+        var universeService = new CqrsUniverseService(cqrsUniverseEngine, store);
+
+        var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints(universeService, modeService);
         var sparkConfiguration = ConfigurationFactory.buildSparkConfiguration(sparkEndpoints);
 
-        var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry, universeEventSSERegistry, sparkConfiguration);
+        var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry, modeSSERegistry, universeEventSSERegistry, sparkConfiguration);
 
         var eventRabbitMqConfiguration = ConfigurationFactory.buildRabbitMqConfiguration();
 
@@ -82,7 +94,7 @@ public class Launcher {
 
     }
 
-    public void stop() {
+    private void stop() {
         if (jettySupport != null) {
             jettySupport.stop();
             jettySupport = null;
