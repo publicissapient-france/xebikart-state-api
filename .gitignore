@@ -3,3 +3,5 @@
 *.sum
 
 /target
+
+.envrc

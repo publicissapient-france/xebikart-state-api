@@ -7,11 +7,10 @@ import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
-import com.hivemq.client.mqtt.mqtt3.message.subscribe.Mqtt3Subscribe;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventReceiver;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventSource;
 import fr.xebia.xebicon.xebikart.api.application.configuration.RabbitMqConfiguration;
-import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
@@ -106,6 +105,16 @@ public class MqttConsumerContainer {
         return mqttClient != null;
     }
 
+    public void publish(@NotNull String payload) {
+        if (mqttClient != null) {
+            mqttClient.publishWith()
+                    .topic("xebikart-modes")
+                    .qos(MqttQos.AT_LEAST_ONCE)
+                    .payload(payload.getBytes())
+                    .send();
+        }
+    }
+
     public synchronized void stop() {
         if (mqttClient != null) {
             LOGGER.info("Stopping MQTT client.");
@@ -114,7 +123,7 @@ public class MqttConsumerContainer {
         }
     }
 
-    private void messageArrived(String topic,  byte[] message) {
+    private void messageArrived(String topic, byte[] message) {
         requireNonNull(message, "message must be defined.");
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("-> MQTT [{}] : {}", topic, new String(message));
