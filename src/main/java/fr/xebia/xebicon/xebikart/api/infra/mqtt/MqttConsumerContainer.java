@@ -105,10 +105,10 @@ public class MqttConsumerContainer {
         return mqttClient != null;
     }
 
-    public void publish(@NotNull String payload) {
+    public void publish(@NotNull String topic, @NotNull String payload) {
         if (mqttClient != null) {
             mqttClient.publishWith()
-                    .topic("xebikart-modes")
+                    .topic(topic)
                     .qos(MqttQos.AT_LEAST_ONCE)
                     .payload(payload.getBytes())
                     .send();

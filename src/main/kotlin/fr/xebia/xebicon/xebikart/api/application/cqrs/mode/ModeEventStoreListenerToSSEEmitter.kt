@@ -14,6 +14,11 @@ import org.slf4j.LoggerFactory
 class ModeEventStoreListenerToSSEEmitter(
         private val eventEmitter: @NotNull EventEmitter,
         private val eventMqttConsumerContainer: MqttConsumerContainer) : EventStoreListener {
+
+    companion object {
+        const val TOPIC_MODES = "xebikart-modes"
+    }
+
     private val logger = LoggerFactory.getLogger(ModeEventStoreListenerToSSEEmitter::class.java)
 
     override fun <E : Event> eventsAppenned(events: List<E>) {
@@ -23,7 +28,7 @@ class ModeEventStoreListenerToSSEEmitter(
                     try {
                         val mode = provideGson.toJson(it)
                         eventEmitter.send(ModeSet::class.java.simpleName, mode)
-                        eventMqttConsumerContainer.publish(mode)
+                        eventMqttConsumerContainer.publish(TOPIC_MODES, mode)
                     } catch (e: JsonParseException) {
                         logger.warn("Cannot send event ${it.identifier()}")
                     }
