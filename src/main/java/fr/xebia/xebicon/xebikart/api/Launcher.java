@@ -35,37 +35,24 @@ public class Launcher {
     private void start() {
 
         var store = new InMemoryEventStore();
+
         var cqrsUniverseEngine = new CqrsEngine<SurveyIdentifier, SurveyState, SurveyCommand, SurveyEvent>(
                 store,
                 new Survey()
         );
-
         var cqrsModeEngine = new CqrsEngine<ModeIdentifier, ModeState, ModeCommand, ModeEvent>(
                 store,
                 new Mode()
         );
-        var modeSSERegistry = new SSEServletEventEmitterRegistry();
-        store.registerListener(new ModeEventStoreListenerToSSEEmitter(modeSSERegistry));
-        var modeService = new CqrsModeService(cqrsModeEngine);
-
-        var universeEventSSERegistry = new SSEServletEventEmitterRegistry();
-        store.registerListener(new SurveyEventStoreListenerToSSEEmitter(universeEventSSERegistry, store));
 
         var eventSSERegistry = new SSEServletEventEmitterRegistry();
-
-        var universeService = new CqrsUniverseService(cqrsUniverseEngine, store);
-
-        var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints(universeService, modeService);
-        var sparkConfiguration = ConfigurationFactory.buildSparkConfiguration(sparkEndpoints);
-
-        var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry, modeSSERegistry, universeEventSSERegistry, sparkConfiguration);
 
         var eventRabbitMqConfiguration = ConfigurationFactory.buildRabbitMqConfiguration();
 
         executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 
-        var videoFetcher = new EventVideoFetcher();
         var sseOutput = new DirectPipeEvent(eventSSERegistry);
+        var videoFetcher = new EventVideoFetcher();
         var fanout = new FanOutPipeEvent(
                 List.of(
                         new FilteredPipeEvent(eventSource -> "xebikart-events".equals(eventSource.getOrigin()), sseOutput),
@@ -80,6 +67,21 @@ public class Launcher {
                 executorService
         );
 
+        var modeSSERegistry = new SSEServletEventEmitterRegistry();
+        store.registerListener(new ModeEventStoreListenerToSSEEmitter(modeSSERegistry, eventMqttConsumerContainer));
+
+        var modeService = new CqrsModeService(cqrsModeEngine);
+
+        var universeEventSSERegistry = new SSEServletEventEmitterRegistry();
+        store.registerListener(new SurveyEventStoreListenerToSSEEmitter(universeEventSSERegistry, store));
+
+        var universeService = new CqrsUniverseService(cqrsUniverseEngine, store);
+
+        var sparkEndpoints = EndpointConfiguration.buildSparkEndpoints(universeService, modeService);
+        var sparkConfiguration = ConfigurationFactory.buildSparkConfiguration(sparkEndpoints);
+
+        var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry, modeSSERegistry, universeEventSSERegistry, sparkConfiguration);
+
         eventMqttConsumerContainer.start();
 
         /*
@@ -91,7 +93,6 @@ public class Launcher {
 
         jettySupport = new JettySupport(jettyConfiguration, servletContextHandlerConfigurers);
         jettySupport.start();
-
     }
 
     private void stop() {
