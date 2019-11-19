@@ -1,8 +1,10 @@
 package fr.xebia.xebicon.xebikart.api.infra.http.server;
 
 import fr.xebia.xebicon.xebikart.api.application.configuration.JettyConfiguration;
+import io.prometheus.client.jetty.JettyStatisticsCollector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -80,6 +82,13 @@ public class JettySupport {
     private void doStart() {
         CountDownLatch startLatch = new CountDownLatch(1);
         server = createAndConfigureJettyServer();
+
+        // Prometheus metrics
+        StatisticsHandler stats = new StatisticsHandler();
+        stats.setHandler(server.getHandler());
+        server.setHandler(stats);
+        new JettyStatisticsCollector(stats).register();
+
         LOGGER.info("Starting web server on port {}.", configuration.getPort());
         new Thread(() -> {
             try {
