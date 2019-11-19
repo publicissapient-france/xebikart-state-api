@@ -6,6 +6,7 @@ import fr.xebia.xebicon.xebikart.api.application.cqrs.*;
 import fr.xebia.xebicon.xebikart.api.application.cqrs.mode.ModeService;
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.*;
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
+import io.prometheus.client.exporter.MetricsServlet;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.List;
@@ -28,7 +29,8 @@ public class EndpointConfiguration {
         return List.of(
                 rootEndpointConfigurer(),
                 videoHtmlEndpointConfigurer(),
-                videoEndpointConfigurer(videoFetcher)
+                videoEndpointConfigurer(videoFetcher),
+                prometheusEndpointConfigurer()
         );
     }
 
@@ -45,6 +47,10 @@ public class EndpointConfiguration {
         return context -> context.addServlet(new ServletHolder(new VideoHtmlPage()), "/car");
     }
 
+    private static JettySupport.ServletContextHandlerConfigurer prometheusEndpointConfigurer() {
+        return context -> context.addServlet(new ServletHolder(new MetricsServlet()), "/metrics");
+    }
+
     private static SparkEndpoint healthEndpoint() {
         return new HealthEndpoint();
     }
@@ -56,5 +62,4 @@ public class EndpointConfiguration {
     private static SparkEndpoint modeEndpoint(ModeService modeService) {
         return new ModeEndpoint(modeService);
     }
-
 }

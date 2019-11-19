@@ -14,6 +14,7 @@ import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse.SSEServletEventEmit
 import fr.xebia.xebicon.xebikart.api.infra.http.server.JettySupport;
 import fr.xebia.xebicon.xebikart.api.infra.mqtt.EventVideoFetcher;
 import fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer;
+import io.prometheus.client.hotspot.DefaultExports;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -82,7 +83,11 @@ public class Launcher {
 
         var jettyConfiguration = ConfigurationFactory.buildJettyConfiguration(eventSSERegistry, modeSSERegistry, universeEventSSERegistry, sparkConfiguration);
 
+        // JVM default metrics
+        DefaultExports.initialize();
+
         eventMqttConsumerContainer.start();
+
 
         /*
         var videoDirectory = new File("/home/jpthiery/workspace/xebia/xebikart/xebikart-api/src/test/resources/video/tub");
