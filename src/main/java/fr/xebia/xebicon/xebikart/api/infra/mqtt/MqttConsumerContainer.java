@@ -10,6 +10,7 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventReceiver;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventSource;
 import fr.xebia.xebicon.xebikart.api.application.configuration.RabbitMqConfiguration;
+import fr.xebia.xebicon.xebikart.api.infra.metrics.MetricFactory;
 import io.prometheus.client.Counter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,12 +29,13 @@ public class MqttConsumerContainer {
 
     private static final Logger LOGGER = getLogger(MqttConsumerContainer.class);
 
-    private static final Counter mqttReceived = Counter.build("mqtt_received_messages_count", "Messages received on a MQTT topic")
-            .labelNames("topic")
+
+    private static final Counter mqttReceived = MetricFactory.createCounter("mqtt_received_messages_total",
+            "Messages received on a MQTT topic", "topic")
             .register();
 
-    private static final Counter mqttPublished = Counter.build("mqtt_published_messages_count", "Messages published on a MQTT topic")
-            .labelNames("topic")
+    private static final Counter mqttPublished = MetricFactory.createCounter("mqtt_published_messages_total",
+            "Messages published on a MQTT topic", "topic")
             .register();
 
     private final RabbitMqConfiguration rabbitMqConfiguration;
@@ -135,7 +137,7 @@ public class MqttConsumerContainer {
 
     private void messageArrived(String topic, byte[] message) {
         requireNonNull(message, "message must be defined.");
-        mqttReceived.labels(topic).inc();;
+        mqttReceived.labels(topic).inc();
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("-> MQTT [{}] : {}", topic, new String(message));
         }
