@@ -5,7 +5,6 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Summary;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import spark.Spark;
 import spark.servlet.SparkApplication;
 
 import java.util.Set;
@@ -17,6 +16,7 @@ import static spark.Spark.*;
 public class SparkEndpointAdapter implements SparkApplication {
 
     private static final Logger LOGGER = getLogger(SparkEndpointAdapter.class);
+    private final static String TIMER_ATTRIBUTE = "timer";
 
     // Custom Prometheus metrics
     private final static String TIMER_ATTRIBUTE = "timer";
