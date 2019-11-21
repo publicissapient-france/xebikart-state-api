@@ -20,12 +20,14 @@ public class SparkEndpointAdapter implements SparkApplication {
 
     // Custom Prometheus metrics
     private static final Counter httpRequestByEndpoint = Counter.build("http_requests_total", "HTTP requests by endpoint")
+            .namespace("xebikart-state-api")
             .labelNames("method", "endpoint", "status")
             .register();
 
     private static final Summary requestLatencyByEndpoint = Summary.build()
             .name("http_request_duration_seconds")
             .help("Request latency")
+            .namespace("xebikart-state-api")
             .labelNames("method", "endpoint")
             .create()
             .register();
