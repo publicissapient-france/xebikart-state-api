@@ -19,14 +19,12 @@ public class SparkEndpointAdapter implements SparkApplication {
     private final static String TIMER_ATTRIBUTE = "timer";
 
     // Custom Prometheus metrics
-    private final static String TIMER_ATTRIBUTE = "timer";
-
-    private static final Counter httpRequestByEndpoint = Counter.build("api_http_request_count", "HTTP requests by endpoint")
+    private static final Counter httpRequestByEndpoint = Counter.build("http_requests_total", "HTTP requests by endpoint")
             .labelNames("method", "endpoint", "status")
             .register();
 
     private static final Summary requestLatencyByEndpoint = Summary.build()
-            .name("api_request_latency")
+            .name("http_request_duration_seconds")
             .help("Request latency")
             .labelNames("method", "endpoint")
             .create()
