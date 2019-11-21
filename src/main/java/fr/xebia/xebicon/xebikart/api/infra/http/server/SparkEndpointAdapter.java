@@ -19,6 +19,8 @@ public class SparkEndpointAdapter implements SparkApplication {
     private static final Logger LOGGER = getLogger(SparkEndpointAdapter.class);
 
     // Custom Prometheus metrics
+    private final static String TIMER_ATTRIBUTE = "timer";
+
     private static final Counter httpRequestByEndpoint = Counter.build("api_http_request_count", "HTTP requests by endpoint")
             .labelNames("method", "endpoint", "status")
             .register();
@@ -44,12 +46,12 @@ public class SparkEndpointAdapter implements SparkApplication {
         before("*", (request, response) -> {
             Summary.Timer requestTimer = requestLatencyByEndpoint.labels(request.requestMethod(), request.pathInfo())
                     .startTimer();
-            request.attribute("timer", requestTimer); // Pass timer into the filter chain
+            request.attribute(TIMER_ATTRIBUTE, requestTimer); // Pass timer into the filter chain
 
             response.header("Content-Type", "application/json");
         });
         afterAfter("/*", ((request, response) -> {
-            Summary.Timer timer = request.attribute("timer");
+            Summary.Timer timer = request.attribute(TIMER_ATTRIBUTE);
             timer.observeDuration();
 
             httpRequestByEndpoint.labels(request.requestMethod(), request.pathInfo(), String.valueOf(response.status()))
