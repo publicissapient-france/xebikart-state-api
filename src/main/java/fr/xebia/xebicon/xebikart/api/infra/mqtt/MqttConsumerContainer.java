@@ -10,6 +10,7 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventReceiver;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventSource;
 import fr.xebia.xebicon.xebikart.api.application.configuration.RabbitMqConfiguration;
+import io.prometheus.client.Counter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -26,6 +27,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class MqttConsumerContainer {
 
     private static final Logger LOGGER = getLogger(MqttConsumerContainer.class);
+
+    private static final Counter mqttReceived = Counter.build("mqtt_received_messages_count", "Messages received on a MQTT topic")
+            .labelNames("topic")
+            .register();
+
+    private static final Counter mqttPublished = Counter.build("mqtt_published_messages_count", "Messages published on a MQTT topic")
+            .labelNames("topic")
+            .register();
 
     private final RabbitMqConfiguration rabbitMqConfiguration;
 
@@ -87,11 +96,11 @@ public class MqttConsumerContainer {
             LOGGER.info("Connected to MQTT server {}:{}", rabbitMqConfiguration.getHost(), rabbitMqConfiguration.getPort());
 
 
-            var subcribeResult = mqttClient.subscribeWith()
+            var subscribeResult = mqttClient.subscribeWith()
                     .topicFilter("#")
                     .qos(MqttQos.AT_MOST_ONCE)
                     .send();
-            LOGGER.info(subcribeResult.toString());
+            LOGGER.info(subscribeResult.toString());
             LOGGER.info("Subscribing topic to all topic of Mqtt server");
 
 
@@ -107,6 +116,7 @@ public class MqttConsumerContainer {
 
     public void publish(@NotNull String topic, @NotNull String payload) {
         if (mqttClient != null) {
+            mqttPublished.labels(topic).inc();
             mqttClient.publishWith()
                     .topic(topic)
                     .qos(MqttQos.AT_LEAST_ONCE)
@@ -125,6 +135,7 @@ public class MqttConsumerContainer {
 
     private void messageArrived(String topic, byte[] message) {
         requireNonNull(message, "message must be defined.");
+        mqttReceived.labels(topic).inc();;
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("-> MQTT [{}] : {}", topic, new String(message));
         }
