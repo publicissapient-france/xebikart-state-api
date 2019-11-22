@@ -50,7 +50,7 @@ public class Launcher {
 
         var eventRabbitMqConfiguration = ConfigurationFactory.buildRabbitMqConfiguration();
 
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+        executorService = Executors.newFixedThreadPool(20);
 
         var sseOutput = new DirectPipeEvent(eventSSERegistry);
         var videoFetcher = new EventVideoFetcher();
