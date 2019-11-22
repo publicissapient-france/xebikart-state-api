@@ -32,7 +32,8 @@ public class VideoHttpServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        LOGGER.trace("Client request video.");
+        var carId = Integer.parseInt(req.getParameter("carId"));
+        LOGGER.trace("Client request video for car " + carId + ".");
         var boundary = RandomStringUtils.randomAlphabetic(10);
         resp.addHeader("Content-Type", String.format(
                 CONTENT_TYPE_FORMAT,
@@ -43,6 +44,7 @@ public class VideoHttpServlet extends HttpServlet {
         out.println("--" + boundary);
 
         videoFetcher.video()
+                .filter(carVideoFrame -> carVideoFrame.getCarId() == carId)
                 .subscribe(videoFrame -> {
                     LOGGER.trace("Sending content from '{}' which size {}", videoFrame.getOrigin(), videoFrame.getContent().length);
                     out.println(CONTENT_TYPE_FRAME);

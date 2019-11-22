@@ -37,7 +37,7 @@ public class LocalFileVideoFetcher implements VideoFetcher {
                 .sorted(Comparator.comparing(File::getName))
                 .map(file -> {
                     try (var input = new FileInputStream(file)) {
-                        return new CarVideoFrame(file.getName(), IOUtils.toByteArray(input));
+                        return new CarVideoFrame(file.getName(), 0, IOUtils.toByteArray(input));
                     } catch (IOException e) {
                         e.printStackTrace();
                         return null;
