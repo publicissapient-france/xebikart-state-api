@@ -1,20 +1,26 @@
 package fr.xebia.xebicon.xebikart.api.infra.mqtt;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import fr.xebia.xebicon.xebikart.api.application.VideoFetcher;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventReceiver;
 import fr.xebia.xebicon.xebikart.api.application.bus.EventSource;
 import fr.xebia.xebicon.xebikart.api.application.model.CarVideoFrame;
 import io.reactivex.Flowable;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.util.Objects.requireNonNull;
+import static org.slf4j.LoggerFactory.getLogger;
 
 public class EventVideoFetcher implements VideoFetcher, EventReceiver {
 
+    private static final Logger LOGGER = getLogger(EventVideoFetcher.class);
 
     private final LinkedBlockingQueue<CarVideoFrame> buffer = new LinkedBlockingQueue<>();
 
@@ -27,10 +33,18 @@ public class EventVideoFetcher implements VideoFetcher, EventReceiver {
     @Override
     public void receive(EventSource eventSource) {
         requireNonNull(eventSource, "eventSource must be defined.");
-        var payload = eventSource.getPayloadAsString();
-        var content = Base64.getMimeDecoder().decode(payload);
-        var carVideoFrame = new CarVideoFrame("mqtt", content);
-        buffer.offer(carVideoFrame);
+        var jsonParser = new JsonParser();
+        var jsonStr = eventSource.getPayloadAsString();
+        try {
+            var json = (JsonObject) jsonParser.parse(jsonStr);
+            var payload = json.getAsJsonPrimitive("frame").getAsString();
+            var carId = json.getAsJsonPrimitive("car").getAsInt();
+            var content = Base64.getMimeDecoder().decode(payload);
+            var carVideoFrame = new CarVideoFrame("mqtt", carId, content);
+            buffer.offer(carVideoFrame);
+        } catch (JsonParseException e) {
+            LOGGER.error("Unable to parse json : {}", jsonStr);
+        }
     }
 
     private class InternalIterable implements Iterator<CarVideoFrame>, Iterable<CarVideoFrame> {
@@ -58,7 +72,7 @@ public class EventVideoFetcher implements VideoFetcher, EventReceiver {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return  buffer.size() > 0;
+            return buffer.size() > 0;
         }
 
         @Override
@@ -67,7 +81,7 @@ public class EventVideoFetcher implements VideoFetcher, EventReceiver {
                 return buffer.take();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                return new CarVideoFrame("empty", new byte[0]);
+                return new CarVideoFrame("empty", 0, new byte[0]);
             }
         }
     }
