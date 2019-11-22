@@ -12,7 +12,7 @@
     <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.sse" level="TRACE"/>
     <logger name="fr.xebia.xebicon.xebikart.api.infra.mqtt" level="INFO"/>
     <logger name="fr.xebia.xebicon.xebikart.api.infra.mqtt.MqttConsumerContainer" level="DEBUG"/>
-    <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.VideoHttpServlet" level="DEBUG"/>
+    <logger name="fr.xebia.xebicon.xebikart.api.infra.http.endpoint.VideoHttpServlet" level="TRACE"/>
     <logger name="fr.xebia.xebicon.xebikart.api.infra.mqtt.EventVideoFetcher" level="DEBUG"/>
 
     <logger name="org.eclipse.jetty" level="INFO"/>
