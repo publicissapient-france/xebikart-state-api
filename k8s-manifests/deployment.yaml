@@ -24,9 +24,9 @@ spec:
         - name: MQTT_PORT
           value: "1883"
         - name: MQTT_USERNAME
-          value: "xebikart1"
+          value: "backend"
         - name: MQTT_PASSWORD
-          value: "xebikart1"
+          value: "backend"
         - name: MQTT_QUEUES
           value: "xebikart-events,race-events"
         resources:
