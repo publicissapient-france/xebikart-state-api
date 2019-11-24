@@ -1,11 +1,11 @@
 package fr.xebia.xebicon.xebikart.api.infra.http.server;
 
 import fr.xebia.xebicon.xebikart.api.infra.http.endpoint.SparkEndpoint;
+import fr.xebia.xebicon.xebikart.api.infra.metrics.MetricFactory;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Summary;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
-import spark.Spark;
 import spark.servlet.SparkApplication;
 
 import java.util.Set;
@@ -17,19 +17,13 @@ import static spark.Spark.*;
 public class SparkEndpointAdapter implements SparkApplication {
 
     private static final Logger LOGGER = getLogger(SparkEndpointAdapter.class);
-
-    // Custom Prometheus metrics
     private final static String TIMER_ATTRIBUTE = "timer";
 
-    private static final Counter httpRequestByEndpoint = Counter.build("api_http_request_count", "HTTP requests by endpoint")
-            .labelNames("method", "endpoint", "status")
+    // Custom Prometheus metrics
+    private static final Counter httpRequestByEndpoint = MetricFactory.createCounter("http_requests_total", "HTTP requests by endpoint", "method", "endpoint", "status")
             .register();
 
-    private static final Summary requestLatencyByEndpoint = Summary.build()
-            .name("api_request_latency")
-            .help("Request latency")
-            .labelNames("method", "endpoint")
-            .create()
+    private static final Summary requestLatencyByEndpoint = MetricFactory.createSummary("http_request_duration_seconds", "Request latency", "method", "endpoint")
             .register();
 
     private final String pathPrefix;
